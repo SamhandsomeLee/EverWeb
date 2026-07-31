@@ -1,0 +1,20 @@
+---
+description: Keep every Git commit synchronized with exactly one EverWeb execution-plan step
+alwaysApply: false
+---
+
+# Execution Ledger
+
+Apply this rule whenever preparing, creating, amending, or reviewing a Git commit.
+
+- Read `docs/execution/EverWeb_Execution_Plan_v1.0.md` before staging.
+- Identify exactly one step owned by the commit.
+- Use that step's predefined `Commit` subject exactly.
+- Before committing, change that step from `未开始` or `⏸ PendingTemplate` to `完成`.
+- Stage the execution plan together with the implementation and tests.
+- Record verification commands, results, and unresolved risks in the step or its completion evidence.
+- Do not complete more than one execution step in a commit.
+- Do not skip an earlier non-Pending step.
+- Do not write the commit's own hash into the same commit; Git history is authoritative for hashes.
+- A `docs(plan)` change must first add or revise an explicit step before implementation continues.
+- If the execution plan is not staged or the status transition is ambiguous, do not run `git commit`.

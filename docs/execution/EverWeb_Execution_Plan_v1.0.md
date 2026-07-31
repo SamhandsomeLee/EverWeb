@@ -10,7 +10,7 @@
 - 目标语言与运行时：Python 3.12
 - 目标赛道：WebRetriever Challenge 2026 · Protocol III
 - 当前状态：待执行
-- 计划规模：87 个 commits（文档基线 1 + 工程基座 3 + Week 0～4 共 83）
+- 计划规模：88 个 commits（文档治理 2 + 工程基座 3 + Week 0～4 共 83）
 - 正式模板状态：`PendingTemplate`
 - 权威优先级：架构 v2.2 > 本执行计划 > 历史架构 > 本地 diagrams
 
@@ -84,17 +84,23 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ## 5. Commit 状态记录格式
 
-每步执行后将状态从 `未开始` 更新为 `完成` 或 `暂停`，并填写：
+每步在执行对应 `git commit` 前，将状态从 `未开始` 或 `⏸ PendingTemplate` 更新为 `完成`，并填写：
 
 ```text
 状态：
-Commit hash：
 验证命令：
 验证结果：
 偏差/未验证项：
 ```
 
-除 `docs(plan)` 修订外，状态更新应随该步骤 commit 一并提交。
+状态和验证证据必须与实现进入同一个 commit。commit hash 不能写入自身内容，否则会形成无法收敛的自引用；实际 hash 以 `git log` 为权威，可在外部报告中引用。
+
+提交前门禁必须确认：
+
+1. 执行计划已暂存。
+2. 恰好一个步骤从未完成状态变为 `完成`。
+3. 所有更早的非 Pending 步骤已经完成。
+4. 使用该步骤预定义的 Commit 标题。
 
 ---
 
@@ -102,21 +108,41 @@ Commit hash：
 
 ### DOC-001 — 建立架构与 Agent 治理基线
 
-- 状态：未开始
+- 状态：完成（历史补记）
 - Commit：`docs: establish architecture and agent governance baseline`
+- 已提交：`961756c73913de2187dff7ea6fdf07d217f6299e`
 - 单一目标：提交当前架构谱系、文档导航、执行计划、`.cursor` 治理和 `.gitignore`，建立实现前的唯一基线。
 - 架构对齐：§0、§1、§3、§31、§36。
 - 不变量：为 `INV-1`～`INV-16` 提供治理入口，不实现运行时代码。
 - 前置：无。
 - 范围：`.cursor/`、`.gitignore`、`docs/README.md`、`docs/architecture/`、`docs/archive/`、`docs/execution/`；排除 `docs/diagrams/`。
 - 验收：
-  - [ ] v2.2 明确为唯一当前架构。
-  - [ ] v1.0、v2.0、v2.1 明确标为历史参考。
-  - [ ] Rules、Skills、Verifier 和安全可用的 Hooks 可被 Cursor 发现。
-  - [ ] Git 不包含 diagrams 生成物和秘密文件。
-  - [ ] 本计划中的 commit 数量、依赖和 PendingTemplate 标记自洽。
+  - [x] v2.2 明确为唯一当前架构。
+  - [x] v1.0、v2.0、v2.1 明确标为历史参考。
+  - [x] Rules、Skills、Verifier 和安全可用的 Hooks 可被 Cursor 发现。
+  - [x] Git 不包含 diagrams 生成物和秘密文件。
+  - [x] 本计划中的 commit 数量、依赖和 PendingTemplate 标记自洽。
 - 测试层级：文档链接检查、Cursor 配置语法检查、`git status` 审计。
 - 回滚边界：仅移除治理与文档基线，不涉及生产代码。
+- 偏差：首条 commit 未同步步骤状态；由 DOC-002 补记并增加提交前硬门禁。
+
+### DOC-002 — 强制执行账本随 commit 更新
+
+- 状态：完成
+- Commit：`fix(governance): enforce execution ledger updates before commits`
+- 单一目标：增加 Cursor Rule 与提交前 Hook，阻止未同步本执行计划的后续 commit。
+- 架构对齐：§31、§36、本计划 §2 与 §5。
+- 前置：DOC-001。
+- 范围：`.cursor/rules/`、`.cursor/hooks.json`、`.cursor/hooks/`、本执行计划。
+- 验收：
+  - [x] `git commit` 前必须暂存本执行计划。
+  - [x] 每次只能完成一个步骤。
+  - [x] 更早的非 Pending 步骤不能保持未完成。
+  - [x] Hook 传输解析异常不会锁死工作区。
+  - [x] Rules 明确要求使用步骤预定义的 commit 标题。
+- 测试层级：Hook 单元式输入测试与实际暂存区检查。
+- 回滚边界：只移除治理门禁，不影响架构与生产代码。
+- 偏差：实际 commit hash 由 Git 历史提供，不写入 commit 自身。
 
 ---
 
@@ -1168,7 +1194,7 @@ Commit hash：
 
 只有满足以下条件，执行计划才可标记完成：
 
-- 87 个步骤均为 `完成`，或 PendingTemplate 步骤在权威记录中被正式取消/替代。
+- 88 个步骤均为 `完成`，或 PendingTemplate 步骤在权威记录中被正式取消/替代。
 - `INV-1`～`INV-16` 均有持续自动化门禁。
 - Week 0～4 DoD 全部有 commit 与验证证据。
 - 附录 B 三个最小案例全部通过。

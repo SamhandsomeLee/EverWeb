@@ -9,6 +9,14 @@
         "failClosed": false
       }
     ],
+    "beforeShellExecution": [
+      {
+        "command": "python .cursor/hooks/guard_execution_commit.py",
+        "matcher": "git\\s+commit",
+        "timeout": 10,
+        "failClosed": true
+      }
+    ],
     "stop": [
       {
         "command": "python .cursor/hooks/verify_on_stop.py",
