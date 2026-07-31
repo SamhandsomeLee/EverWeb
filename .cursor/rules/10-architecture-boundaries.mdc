@@ -1,0 +1,25 @@
+---
+description: Enforce EverWeb package ownership and dependency direction
+globs: src/everweb/**/*.py
+alwaysApply: false
+---
+
+# Architecture Boundaries
+
+Use the dependency direction defined in §4.3 of the canonical design:
+
+```text
+competition → supervisor → core → ports → domain
+adapters → ports/domain
+application services → ports/domain
+harness → public application/core interfaces
+```
+
+- `domain` contains pure types, contracts, states, receipts, and errors. It must not import Playwright, provider SDKs, HTTP clients, adapters, or runtime services.
+- `core` orchestrates state, budget, policy, step accounting, and termination through ports. It must not import provider SDKs or adapter implementations.
+- `competition` maps official input, output, status, and step semantics. It must not depend on answer internals.
+- Adapters implement ports and must not access core private state or import one another.
+- Production modules must never import `everweb.harness`.
+- Do not create generic `utils.py`, service locators, or shared mutable globals to bypass layer ownership.
+- New modules require one clear owning layer and the narrowest public interface.
+- Add or update import-linter contracts whenever a new package boundary is introduced.

@@ -1,0 +1,49 @@
+---
+description: Safe Git workflow for status inspection, staging, commits, branches, merges, rebases, pushes, and pull request preparation
+alwaysApply: false
+---
+
+# Git Workflow
+
+## Authority
+
+- Read-only Git inspection is allowed when relevant.
+- Do not commit, push, merge, rebase, amend, create or delete branches, or modify remotes unless the user explicitly requests it.
+- Never modify local or global Git configuration.
+
+## Before Mutation
+
+- Inspect `git status --short --branch`.
+- Review both staged and unstaged diffs.
+- Inspect recent commit messages before choosing a commit style.
+- Before pushing, confirm the current branch, upstream, remote, and ahead/behind state.
+
+## Protect Work
+
+- Preserve all user-authored and pre-existing changes.
+- Stage only files belonging to the requested logical change.
+- Avoid blanket staging when unrelated changes exist.
+- Never commit secrets, environment files, credentials, private keys, generated runtime data, or ignored artifacts.
+- Do not discard changes with `reset --hard`, `clean`, `checkout --`, or destructive `restore` unless explicitly approved.
+
+## Commits
+
+- Create commits only when explicitly requested.
+- Keep each commit focused on one logical purpose.
+- Follow repository history; when no style exists, use `type(scope): concise summary`.
+- Focus the message on intent and reason, not a file list.
+- Do not use `--no-verify`, bypass hooks, or disable signing requirements.
+- Do not amend unless requested, or a newly created unpushed commit needs hook-generated files included.
+
+## Push and History Rewriting
+
+- Push only when explicitly requested.
+- Never force-push `main` or `master`.
+- Any other force push requires explicit approval and a warning about rewritten history.
+- Avoid interactive Git commands that require unsupported terminal input.
+
+## Verification
+
+- After a commit or push, inspect status and the resulting commit.
+- Report the commit hash, branch, push state, and remaining changes.
+- Never claim a commit or push succeeded without verifying it.

@@ -1,0 +1,18 @@
+---
+description: EverWeb test strategy, fixtures, regression discipline, and completion gates
+globs: tests/**/*.py, src/everweb/harness/**/*.py, scripts/**/*.py
+alwaysApply: false
+---
+
+# Testing and Definition of Done
+
+- Test behavior through public domain, port, application, and core interfaces; do not couple tests to private runtime state.
+- Unit tests cover schemas, policy, StepMeter, Budget, evidence normalization, proofs, gates, serializer purity, and redaction.
+- Contract tests cover every Port, null adapter, CompetitionAdapter, output contract, provider manifest, and off/shadow equivalence.
+- Scenario tests model `state + TypedAction → next state + Receipt` and cover pagination, popup/frame, stale refs, recovery, no-progress, and non-idempotent reconciliation.
+- Fault tests cover model timeout, 429/5xx, malformed output, CDP disconnect, page crash, Worker SIGKILL, OOM, disk failure, JSONL half-lines, artifact failure, memory failure, and secret injection.
+- Passive Replay must be deterministic after normalization. Live Provider runs are statistical and must not assert byte-identical traces.
+- Every production failure becomes a minimized fixture with a bug-specific assertion at the first divergent event.
+- Do not update expected outputs merely to accept a changed implementation; explain the contract change first.
+- Tests must assert receipts, trace events, evidence, gates, or terminal states—not only “no exception”.
+- A task is complete only when targeted tests pass and applicable architecture, type, lint, and contract checks have run.

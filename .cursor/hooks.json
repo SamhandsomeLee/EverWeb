@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "command": "python .cursor/hooks/protect_paths.py",
+        "matcher": "Write|Delete",
+        "timeout": 5,
+        "failClosed": false
+      }
+    ],
+    "stop": [
+      {
+        "command": "python .cursor/hooks/verify_on_stop.py",
+        "timeout": 120,
+        "loop_limit": 2,
+        "failClosed": false
+      }
+    ]
+  }
+}

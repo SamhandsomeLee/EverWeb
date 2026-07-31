@@ -1,0 +1,19 @@
+---
+description: Runtime, supervisor, action, and failover invariants
+globs: src/everweb/core/**/*.py, src/everweb/supervisor/**/*.py, src/everweb/act/**/*.py
+alwaysApply: false
+---
+
+# Runtime Invariants
+
+- All target-site interaction goes through `BrowserPort`; never add direct target HTTP, shell, or arbitrary JavaScript escape paths.
+- Models may propose only validated `TypedAction` values. Policy, budget, status, and terminal decisions remain outside the model.
+- `StepMeter` is the single authoritative accounting boundary. Never increment official steps elsewhere.
+- Preserve the documented runtime phase transitions. State changes require explicit receipts and append-only trace events.
+- Potential or confirmed write actions must be reconciled after ambiguous outcomes; never retry them blindly.
+- A Worker crash, timeout, OOM, or forced termination must still permit Supervisor `EmergencyEmit` from persisted facts.
+- Model failover is allowed only before browser effects or at a persisted safe checkpoint.
+- Every route transition increments `route_generation` and appends a `ModelRouteReceipt`.
+- Never transfer provider-private reasoning or conversation state across a route transition.
+- Memory, Knowledge, and Vision are optional. Their absence or failure must not prevent the core run from producing durable output.
+- Use injected clocks and explicit deadlines for budget behavior; do not hide wall-clock reads in domain or core logic.

@@ -1,0 +1,19 @@
+---
+description: Evidence, answer gates, trace projection, and output purity rules
+globs: src/everweb/answer/**/*.py, src/everweb/report/**/*.py, src/everweb/competition/**/*.py
+alwaysApply: false
+---
+
+# Evidence and Output
+
+- An answer field cannot enter `FrozenStructuredAnswer` without active `EvidenceAtom` bindings.
+- Computed evidence must have non-empty parents and be deterministically reproducible.
+- Conflicting evidence must remain explicit; lower-confidence evidence cannot silently overwrite stronger evidence.
+- A complete-set answer cannot reach `VERIFIED_SUCCESS` without a valid `StopProof`.
+- “No new items twice” is never sufficient as the sole completeness proof.
+- `VERIFIED_SUCCESS` requires both NavigationGate and AnswerGate to pass.
+- URLs come only from navigation events, actions from `ActionReceipt`, and screenshots from `CaptureReceipt`.
+- Official arrays are chronological projections of append-only facts. Never synthesize, reorder, or backfill trajectory data.
+- `SERIALIZE` is a pure transformation over persisted facts and must have no Browser, Model, Vision, Memory, filesystem discovery, or network access.
+- Core and answer code use only `InternalTerminalState`; official status strings belong exclusively to `CompetitionAdapter`.
+- Secret scanning and output schema validation must run before atomic emit.

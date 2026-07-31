@@ -1,0 +1,17 @@
+---
+description: EverWeb project contract and anti-drift baseline
+alwaysApply: true
+---
+
+# EverWeb Project Contract
+
+- Treat `docs/architecture/EverWeb_Architecture_v2.2_Kimi_First.md` as the current canonical design.
+- Before implementation, identify the relevant document section, architecture invariant (`INV-*`), implementation week, and Definition of Done.
+- Inspect the current implementation and tests before editing. Do not rely on the design document alone when code already exists.
+- Implement only the requested vertical slice. Do not add adjacent features, speculative abstractions, or unrelated cleanup.
+- Do not invent values for fields marked `Unknown`, `None`, or `PendingTemplate`. Keep unresolved competition semantics isolated behind `CompetitionAdapter`.
+- Prefer explicit domain types, receipts, and ports over untyped dictionaries or cross-layer shortcuts.
+- Every production behavior change requires proportionate automated tests. A passing test does not excuse violating an architecture invariant.
+- Do not weaken contracts, gates, security checks, or tests to make an implementation pass.
+- If code, tests, and the canonical design disagree, stop and report the conflict instead of silently choosing one.
+- Before completion, run the available targeted checks and report changed files, verification evidence, and unresolved specification gaps.

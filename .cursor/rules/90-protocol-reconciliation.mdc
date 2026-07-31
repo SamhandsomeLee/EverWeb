@@ -1,0 +1,18 @@
+---
+alwaysApply: false
+---
+
+# Competition Protocol Reconciliation
+
+Apply this rule only when the user explicitly requests migration to a newly published official competition template.
+
+1. Capture the official template and guidance as versioned source material with a digest.
+2. Compare input schema, output schema, status values, step semantics, wall-clock limits, download behavior, capture format, screenshot selection, and directory requirements.
+3. Record every difference from the current `CompetitionCapabilities`.
+4. Contain all compatibility changes inside `competition/` and its public adapter boundary.
+5. Do not leak official status strings or scorer-specific behavior into core, answer, or domain packages.
+6. Add contract tests and at least three smoke fixtures before replacing the previous contract snapshot.
+7. Re-run serializer purity, trace projection, emergency output, and scorer compatibility tests.
+8. Freeze the new `competition_contract_digest` only after every unknown field is resolved or remains explicitly marked pending.
+
+Never infer official semantics from OpenNavEval behavior alone.
