@@ -42,6 +42,7 @@ def test_ci_runs_required_quality_gates() -> None:
     )
     assert steps["Lint"]["run"] == "python -m ruff check ."
     assert steps["Type check"]["run"] == "python -m mypy src tests"
+    assert steps["Architecture"]["run"] == "lint-imports --no-cache"
     assert steps["Test"]["run"] == "python -m pytest -q"
 
 
@@ -61,6 +62,7 @@ def test_ci_has_no_provider_browser_or_sealed_dependencies() -> None:
 
     assert project["project"]["dependencies"] == []
     assert set(project["project"]["optional-dependencies"]["dev"]) == {
+        "import-linter",
         "mypy",
         "pytest",
         "pyyaml",

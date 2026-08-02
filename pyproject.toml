@@ -9,10 +9,172 @@ requires-python = ">=3.12,<3.13"
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["mypy", "pytest", "pyyaml", "ruff", "types-pyyaml"]
+dev = ["import-linter", "mypy", "pytest", "pyyaml", "ruff", "types-pyyaml"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.importlinter]
+root_package = "everweb"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+id = "layered-architecture"
+name = "Competition runtime layers point inward"
+type = "layers"
+layers = [
+    "everweb.competition",
+    "everweb.supervisor",
+    "everweb.core",
+    "everweb.ports",
+    "everweb.domain",
+]
+
+[[tool.importlinter.contracts]]
+id = "domain-isolation"
+name = "Domain is isolated from infrastructure and runtime services"
+type = "forbidden"
+source_modules = ["everweb.domain"]
+forbidden_modules = [
+    "everweb.act",
+    "everweb.adapters",
+    "everweb.answer",
+    "everweb.competition",
+    "everweb.core",
+    "everweb.harness",
+    "everweb.perceive",
+    "everweb.ports",
+    "everweb.report",
+    "everweb.supervisor",
+    "httpx",
+    "playwright",
+]
+
+[[tool.importlinter.contracts]]
+id = "adapter-independence"
+name = "Adapters are mutually independent"
+type = "independence"
+modules = [
+    "everweb.adapters.deepseek",
+    "everweb.adapters.everos",
+    "everweb.adapters.filesystem",
+    "everweb.adapters.moonshot",
+    "everweb.adapters.null_vision",
+    "everweb.adapters.playwright_browser",
+]
+
+[[tool.importlinter.contracts]]
+id = "provider-browser-isolation"
+name = "Provider adapters do not import the browser adapter"
+type = "forbidden"
+source_modules = [
+    "everweb.adapters.deepseek",
+    "everweb.adapters.moonshot",
+]
+forbidden_modules = ["everweb.adapters.playwright_browser"]
+
+[[tool.importlinter.contracts]]
+id = "competition-public-entry"
+name = "Competition uses only the supervisor public entry"
+type = "forbidden"
+source_modules = ["everweb.competition"]
+forbidden_modules = [
+    "everweb.act",
+    "everweb.adapters",
+    "everweb.answer",
+    "everweb.core",
+    "everweb.domain",
+    "everweb.harness",
+    "everweb.perceive",
+    "everweb.ports",
+    "everweb.report",
+    "everweb.supervisor.*",
+]
+allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
+id = "production-harness-isolation"
+name = "Production packages do not import the harness"
+type = "forbidden"
+source_modules = [
+    "everweb.act",
+    "everweb.adapters",
+    "everweb.answer",
+    "everweb.competition",
+    "everweb.core",
+    "everweb.domain",
+    "everweb.perceive",
+    "everweb.ports",
+    "everweb.report",
+    "everweb.supervisor",
+]
+forbidden_modules = ["everweb.harness"]
+
+[[tool.importlinter.contracts]]
+id = "application-boundaries"
+name = "Application services depend only on ports domain and peer services"
+type = "forbidden"
+source_modules = [
+    "everweb.act",
+    "everweb.answer",
+    "everweb.perceive",
+    "everweb.report",
+]
+forbidden_modules = [
+    "everweb.adapters",
+    "everweb.competition",
+    "everweb.core",
+    "everweb.harness",
+    "everweb.supervisor",
+    "httpx",
+    "playwright",
+]
+
+[[tool.importlinter.contracts]]
+id = "adapter-runtime-boundaries"
+name = "Adapters depend only on ports and domain"
+type = "forbidden"
+source_modules = ["everweb.adapters"]
+forbidden_modules = [
+    "everweb.act",
+    "everweb.answer",
+    "everweb.competition",
+    "everweb.core",
+    "everweb.harness",
+    "everweb.perceive",
+    "everweb.report",
+    "everweb.supervisor",
+]
+
+[[tool.importlinter.contracts]]
+id = "root-harness-isolation"
+name = "The root production module does not import the harness"
+type = "forbidden"
+source_modules = ["everweb"]
+forbidden_modules = ["everweb.harness"]
+as_packages = false
+
+[[tool.importlinter.contracts]]
+id = "runtime-side-boundaries"
+name = "Runtime layers do not depend on application adapters or infrastructure"
+type = "forbidden"
+source_modules = [
+    "everweb.competition",
+    "everweb.core",
+    "everweb.domain",
+    "everweb.ports",
+    "everweb.supervisor",
+]
+forbidden_modules = [
+    "everweb.act",
+    "everweb.adapters",
+    "everweb.answer",
+    "everweb.harness",
+    "everweb.perceive",
+    "everweb.report",
+    "httpx",
+    "playwright",
+]
 
 [tool.ruff]
 target-version = "py312"

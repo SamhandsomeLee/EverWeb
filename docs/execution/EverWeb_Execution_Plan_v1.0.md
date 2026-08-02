@@ -177,13 +177,16 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### BL-003 — 强制分层导入边界
 
-- 状态：未开始
+- 状态：完成
 - Commit：`build: enforce layered import boundaries with import-linter`
 - 目标：实现 §4.4 六条 import-linter 门禁。
 - 对齐：§4.3、§4.4。
 - 前置：BL-001。
 - 验收：覆盖 layered contract、domain 隔离、adapter 独立、competition 入口、生产代码禁止导入 harness。
 - 测试：`U/C` 架构测试。
+- 验证命令：`.venv\Scripts\python.exe -m ruff check .`；`.venv\Scripts\python.exe -m mypy src tests`；`.venv\Scripts\lint-imports.exe --no-cache`；`.venv\Scripts\python.exe -m pytest -q`；`git diff --check`。
+- 验证结果：Ruff 全绿；mypy strict 检查 21 个源文件无问题；import-linter 分析 18 个包文件并保持 10 个契约、0 个破坏（§4.4 六项加 application、adapter-runtime、根包 harness、runtime-side 四项 §4.3 闭环）；16 个 Unit/Contract 测试通过，其中 10 个负向 canary 分别证明对应契约拒绝违规 import。
+- 偏差/未验证项：Provider SDK 包名未确定，因此 domain 外部隔离仅门禁架构已明确的 `playwright` 与 `httpx`，内部 Adapter 隔离已覆盖；GitHub Actions run 在本 commit 推送后作为外部验收证据。
 
 ---
 
