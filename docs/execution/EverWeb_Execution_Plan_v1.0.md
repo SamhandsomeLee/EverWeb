@@ -164,13 +164,16 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### BL-002 — 建立无密钥 CI
 
-- 状态：未开始
+- 状态：完成
 - Commit：`build: add ci pipeline without api keys`
 - 目标：建立 lint、type、test CI，默认不读取 Moonshot/DeepSeek 密钥。
 - 对齐：§31 Week 0 DoD。
 - 前置：BL-001。
 - 验收：干净环境 CI 全绿且 10 分钟内结束；无 Provider 与 CDP 依赖。
 - 测试：`U`。
+- 验证命令：`.venv\Scripts\python.exe -m pip install -e ".[dev]"`；`.venv\Scripts\python.exe -m ruff check .`；`.venv\Scripts\python.exe -m mypy src tests`；`.venv\Scripts\python.exe -m pytest -q`；`git diff --check`。
+- 验证结果：Ruff 全绿；mypy strict 检查 20 个源文件无问题；4 个 Unit 测试通过；CI 契约确认 Python 3.12、只读权限、10 分钟超时，且无密钥、Provider、Playwright/CDP 或 sealed 数据依赖。
+- 偏差/未验证项：依赖安装首次受 PyPI 下载超时中断，重试后成功；`.cursor/` 治理脚本不属于产品 CI lint 范围并由 Ruff 排除；GitHub Actions 干净 runner 的 run URL、结论与耗时在本 commit 推送后作为外部验收证据记录。
 
 ### BL-003 — 强制分层导入边界
 

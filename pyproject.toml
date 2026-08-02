@@ -9,10 +9,21 @@ requires-python = ">=3.12,<3.13"
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest"]
+dev = ["mypy", "pytest", "pyyaml", "ruff", "types-pyyaml"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.ruff]
+target-version = "py312"
+exclude = [".cursor"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

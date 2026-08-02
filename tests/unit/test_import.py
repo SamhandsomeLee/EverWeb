@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from importlib import import_module
 
-
 EXPECTED_PACKAGES = (
     "act",
     "adapters",
