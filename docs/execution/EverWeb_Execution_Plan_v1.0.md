@@ -150,7 +150,7 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### BL-001 — 初始化 Python 工程骨架
 
-- 状态：未开始
+- 状态：完成
 - Commit：`chore: initialize everweb python project skeleton`
 - 目标：创建 §5 目录树、`pyproject.toml`、Python 3.12 包和运行目录占位。
 - 对齐：§0、§5。
@@ -158,6 +158,9 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 验收：包可安装、`import everweb` 成功、目录所有权与 §5 一致。
 - 测试：`U` import smoke。
 - 回滚：不影响文档基线。
+- 验证命令：`python -m venv .venv`；`.venv\Scripts\python.exe -m pip install -e ".[dev]"`；`.venv\Scripts\python.exe -m pytest -q`；`.venv\Scripts\python.exe -c "import everweb"`；PowerShell `Test-Path` 目录审计。
+- 验证结果：Python 3.12.10 可编辑安装成功；2 个 import smoke 测试通过；`import everweb` 成功；§5 的 32 个仓库拥有目录均存在。
+- 偏差/未验证项：`evalset/sealed/` 按安全 Hook 保持只读且由外部挂载或创建，不提交占位内容；未来步骤拥有的模块文件未提前创建。
 
 ### BL-002 — 建立无密钥 CI
 

@@ -1,0 +1,1 @@
+"""EverWeb competition package boundary."""
