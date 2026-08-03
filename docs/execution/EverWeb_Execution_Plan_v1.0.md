@@ -331,7 +331,7 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-011 — EmergencySnapshot 检查点
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(supervisor): persist emergency snapshot checkpoints`
 - 目标：在架构规定的关键时点持久化 EmergencySnapshot。
 - 对齐：§7.5。
@@ -339,6 +339,8 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 前置：W0-010。
 - 验收：ANALYZE、成功动作、Ledger/Candidate 更新、PREPARE 前、Decision 后均可更新。
 - 测试：`U/C`。
+- 验证结果：定向 EmergencySnapshot Unit/Contract 33 通过、1 个 symlink run_directory 测试因环境跳过；Ruff 全绿；mypy strict 检查 72 个源文件无问题；import-linter 分析 68 个文件与 153 条依赖，10 个契约全部保持；全量 281 个测试通过，6 个平台相关测试跳过；`git diff --check` 通过。
+- 偏差/未验证项：canonical 未定义 `GateReceipt` 字段，经确认采用最小冻结占位仅含 `accepted: bool`；本步提供 Supervisor `EmergencySnapshotStore` 原子写/读 `run/<execution_id>/emergency_snapshot.json` 与六值 `CheckpointReason`，用 U/C 覆盖六类时点，不接 Queue IPC、runtime loop、Evidence Ledger/Candidate/Gate 真实逻辑或 EmergencyEmitter（W0-014）；`updated_at` 由注入 `ClockPort.now()` 覆盖；损坏/截断 JSON 以 corruption 失败关闭；Windows 上目录 fsync 为 no-op（与 ArtifactStore 一致）；GitHub Actions run 在本 commit 推送后作为外部验收证据。
 
 ### W0-012 — 纯 Serializer v0
 

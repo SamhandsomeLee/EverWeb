@@ -2,8 +2,10 @@
 
 from everweb.domain.action import ActionKind, TypedAction
 from everweb.domain.contract import Receipt
+from everweb.domain.emergency import EmergencySnapshot
 from everweb.domain.errors import ErrorCode, FailureRecord
 from everweb.domain.evidence import EvidenceAtom
+from everweb.domain.gate import GateReceipt
 from everweb.domain.port_contracts import (
     ActionReceipt,
     ArtifactRef,
@@ -44,9 +46,11 @@ __all__ = [
     "CaptureRequest",
     "CloseReceipt",
     "Deadline",
+    "EmergencySnapshot",
     "ErrorCode",
     "EvidenceAtom",
     "FailureRecord",
+    "GateReceipt",
     "InternalTerminalState",
     "MemoryHealth",
     "ModelCapabilities",

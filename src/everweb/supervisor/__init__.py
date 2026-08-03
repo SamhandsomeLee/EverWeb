@@ -1,5 +1,12 @@
 """EverWeb supervisor package boundary."""
 
+from everweb.supervisor.emergency_snapshot import (
+    CheckpointReason,
+    EmergencySnapshotCorruptionError,
+    EmergencySnapshotError,
+    EmergencySnapshotStore,
+    EmergencySnapshotValidationError,
+)
 from everweb.supervisor.heartbeat import (
     HeartbeatError,
     HeartbeatMonitor,
@@ -22,6 +29,11 @@ from everweb.supervisor.worker_process import (
 )
 
 __all__ = [
+    "CheckpointReason",
+    "EmergencySnapshotCorruptionError",
+    "EmergencySnapshotError",
+    "EmergencySnapshotStore",
+    "EmergencySnapshotValidationError",
     "HeartbeatError",
     "HeartbeatMonitor",
     "HeartbeatNotFoundError",
