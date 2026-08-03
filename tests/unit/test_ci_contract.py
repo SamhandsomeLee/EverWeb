@@ -60,7 +60,7 @@ def test_ci_has_no_provider_browser_or_sealed_dependencies() -> None:
     ):
         assert forbidden not in workflow
 
-    assert project["project"]["dependencies"] == []
+    assert project["project"]["dependencies"] == ["pydantic>=2,<3"]
     assert set(project["project"]["optional-dependencies"]["dev"]) == {
         "import-linter",
         "mypy",

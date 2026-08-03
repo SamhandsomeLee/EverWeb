@@ -196,13 +196,16 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-001 — TaskIdentity 与基础错误类型
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(domain): add task identity and error types`
 - 目标：增加 `TaskIdentity`、基础 Error 与 Receipt 类型。
 - 对齐：§5 `domain/`。
 - 前置：BL-003。
 - 验收：类型不可变、可序列化、错误码不包含正式 status。
 - 测试：`U` schema。
+- 验证命令：`.venv\Scripts\python.exe -m pytest tests/unit/domain -q`；`.venv\Scripts\python.exe -m ruff check .`；`.venv\Scripts\python.exe -m mypy src tests`；`.venv\Scripts\lint-imports.exe --no-cache`；`.venv\Scripts\python.exe -m pytest -q`；`git diff --check`。
+- 验证结果：Pydantic 2.13.4 安装成功；16 个定向 domain 测试通过；Ruff 全绿；mypy strict 检查 27 个源文件无问题；import-linter 分析 23 个包文件与 8 条依赖，10 个契约全部保持；全量 32 个测试通过。
+- 偏差/未验证项：Canonical 未定义完整 `FailureRecord` 与通用 Receipt 字段，本步骤仅实现内部 namespaced `ErrorCode`、最小 `FailureRecord(code, message)` 和无业务字段的冻结 Receipt 基类；按用户要求未提交，因此未触发 GitHub Actions。
 
 ### W0-002 — 内部终态枚举
 
