@@ -251,7 +251,7 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-005 — 定义核心 Ports
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(ports): define browser model artifact and clock ports`
 - 目标：定义 Browser、Model、Vision、Memory、Artifact、Clock Port。
 - 对齐：§5、§9.1、§20.1、附录 A。
@@ -259,6 +259,9 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 前置：W0-004。
 - 验收：Port 仅依赖 domain；无 Adapter 或 SDK 类型泄漏。
 - 测试：`C` stub conformance。
+- 验证命令：`.venv\Scripts\python.exe -m pytest tests/contract/test_port_conformance.py -q`；`.venv\Scripts\python.exe -m ruff check .`；`.venv\Scripts\python.exe -m mypy src tests`；`.venv\Scripts\lint-imports.exe --no-cache`；`.venv\Scripts\python.exe -m pytest -q`；`git diff --check`。
+- 验证结果：5 个定向 Port contract 测试通过；Ruff 全绿；mypy strict 检查 45 个源文件无问题；import-linter 分析 37 个包文件与 45 条依赖，10 个契约全部保持；全量 88 个测试通过。
+- 偏差/未验证项：canonical 仅完整定义 `BrowserCapabilities`，其余 Port DTO/Receipt 仅建立无猜测字段的严格冻结占位，留待所属后续步骤扩展；canonical 未定义 `ClockPort` 签名，经确认采用 `now() -> datetime` 与 `monotonic() -> float`，不含 sleep/推进时间；未接入 Adapter、SDK、真实 I/O 或 Null/Fake 行为；GitHub Actions run 在本 commit 推送后作为外部验收证据。
 
 ### W0-006 — Append-only Trace Writer
 
