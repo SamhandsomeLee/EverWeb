@@ -292,7 +292,7 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-008 — Budget 与 StepMeter 骨架
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(core): add budget and step meter skeleton`
 - 目标：建立 Budget 三线和唯一 StepMeter 记录入口。
 - 对齐：§6.3、§11。
@@ -300,6 +300,8 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 前置：W0-005。
 - 验收：官方步骤不能在其他模块直接递增；正式语义仍 Pending。
 - 测试：`U`。
+- 验证结果：40 个 Budget/StepMeter 定向 Unit 测试通过；Ruff 全绿；mypy strict 检查 60 个源文件无问题；import-linter 分析 59 个包文件与 104 条依赖，10 个契约全部保持；全量 204 个测试通过，4 个依赖平台符号链接权限的既有安全测试跳过；`git diff --check` 通过。
+- 偏差/未验证项：canonical 未定义 Budget 评估 API、StepReceipt schema 及本地 iteration 计数语义，经确认采用纯 `BudgetAssessment`、最小 `StepReceipt(action_id/mode/step_delta/recorded_total)` 与 Policy 注入；`action_based` 本地默认每次 `record()` 计 1，`iteration_based`/`official_adapter` 未注入 Policy 时明确拒绝；封盘墙钟线使用 serialize+emergency reserve，模型调用耗尽单独报告而不擅自触发全局硬停；未接线 Browser/CompetitionAdapter、未切换运行时阶段，正式 `official_step_semantics` 继续保持 PendingTemplate，留 W1-005/W4-004；GitHub Actions run 在本 commit 推送后作为外部验收证据。
 
 ### W0-009 — Spawn Worker 骨架
 
