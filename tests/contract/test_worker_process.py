@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import signal
 import time
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -13,10 +14,12 @@ from pydantic import ValidationError
 
 from everweb.domain import Receipt, TaskIdentity
 from everweb.supervisor import (
+    HeartbeatStatus,
     SpawnWorkerPool,
     WorkerAssignment,
     WorkerExitReceipt,
     WorkerHandle,
+    WorkerHeartbeat,
     WorkerLeaseConflictError,
     WorkerNotFoundError,
     WorkerStartError,
@@ -72,6 +75,17 @@ class FailOnceEntrypoint:
         return FailOnceEntrypoint, ()
 
 
+class MutableClock:
+    def __init__(self) -> None:
+        self.monotonic_value = 100.0
+
+    def now(self) -> datetime:
+        return datetime(2026, 8, 3, tzinfo=UTC)
+
+    def monotonic(self) -> float:
+        return self.monotonic_value
+
+
 def assignment(
     *,
     execution_id: str = "execution-001",
@@ -118,6 +132,45 @@ def test_default_worker_starts_exits_and_is_reaped() -> None:
             exit_code=0,
         )
         assert pool.active_count == 0
+
+
+def test_real_queue_heartbeat_is_validated_and_retained_after_exit() -> None:
+    value = assignment()
+    clock = MutableClock()
+    pool = SpawnWorkerPool(entrypoint=slow_worker, clock=clock)
+    handle = pool.start(value)
+    deadline = time.monotonic() + 5.0
+    received: tuple[WorkerHeartbeat, ...] = ()
+
+    try:
+        while not received and time.monotonic() < deadline:
+            received = pool.drain_heartbeats(value.execution_id)
+            if not received:
+                time.sleep(0.01)
+
+        assert received
+        latest = pool.latest_heartbeat(value.execution_id)
+        assert latest is not None
+        assert latest.execution_id == value.execution_id
+        assert latest.pid == handle.pid
+        assert (
+            pool.heartbeat_status(value.execution_id)
+            is HeartbeatStatus.ALIVE
+        )
+
+        clock.monotonic_value += 6.001
+        assert (
+            pool.heartbeat_status(value.execution_id)
+            is HeartbeatStatus.EXPIRED
+        )
+    finally:
+        pool.shutdown()
+
+    assert pool.latest_heartbeat(value.execution_id) is not None
+    assert (
+        pool.heartbeat_status(value.execution_id)
+        is HeartbeatStatus.EXITED
+    )
 
 
 @pytest.mark.parametrize(
@@ -263,6 +316,38 @@ def test_spawn_failure_rolls_back_active_slot() -> None:
     assert receipt.exit_code == 0
 
 
+def test_unstoppable_start_failure_keeps_heartbeat_registration(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pool = SpawnWorkerPool(entrypoint=slow_worker)
+    value = assignment()
+    real_register = pool._heartbeat_monitor.register
+    real_terminate = SpawnWorkerPool.__dict__["_terminate_and_join"]
+
+    def register_then_fail(execution_id: str, pid: int) -> None:
+        real_register(execution_id, pid)
+        raise RuntimeError("injected post-register failure")
+
+    monkeypatch.setattr(pool._heartbeat_monitor, "register", register_then_fail)
+    monkeypatch.setattr(
+        SpawnWorkerPool,
+        "_terminate_and_join",
+        staticmethod(lambda process: False),
+    )
+
+    with pytest.raises(WorkerStartError, match="could not be stopped safely"):
+        pool.start(value)
+
+    assert pool.active_count == 1
+    assert (
+        pool.heartbeat_status(value.execution_id) is HeartbeatStatus.ALIVE
+    )
+
+    monkeypatch.setattr(SpawnWorkerPool, "_terminate_and_join", real_terminate)
+    pool.shutdown()
+    assert pool.active_count == 0
+
+
 def test_reap_rejects_unknown_worker_and_invalid_timeout() -> None:
     pool = SpawnWorkerPool()
 
@@ -345,4 +430,11 @@ def test_pool_exposes_only_approved_lifecycle_methods() -> None:
         if not name.startswith("_") and callable(value)
     }
 
-    assert public_methods == {"reap", "shutdown", "start"}
+    assert public_methods == {
+        "drain_heartbeats",
+        "heartbeat_status",
+        "latest_heartbeat",
+        "reap",
+        "shutdown",
+        "start",
+    }

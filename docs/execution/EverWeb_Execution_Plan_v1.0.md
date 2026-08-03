@@ -318,7 +318,7 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-010 — WorkerHeartbeat
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(supervisor): implement worker heartbeat protocol`
 - 目标：实现 Heartbeat IPC 和 2～5 秒心跳契约。
 - 对齐：§7.4。
@@ -326,6 +326,8 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 前置：W0-009。
 - 验收：Parent 能识别存活、过期和退出；Heartbeat 不进入模型上下文。
 - 测试：`C/F` fake clock。
+- 验证结果：定向 Heartbeat Unit/Fault/Contract 测试通过（含 fail-closed 保留 heartbeat 注册回归），1 个 POSIX SIGTERM escalation 因本机 Windows 跳过；Ruff 全绿；mypy strict 检查 66 个源文件无问题；import-linter 分析 65 个文件与 133 条依赖，10 个契约全部保持；全量 248 个测试通过，5 个平台相关测试跳过；`git diff --check` 通过。
+- 偏差/未验证项：canonical 未定义 Heartbeat IPC、Policy/Status 或 Parent Monitor API，经确认采用每 Worker 单向 Queue + 内部 bootstrap 周期发送（保持现有 entrypoint 签名）、JSON-native wire dict、注入 `ClockPort` 的 Parent `HeartbeatMonitor`，以及 `alive/expired/exited` 三态；默认 `interval_s=3.0`、`stale_after_s=6.0`、`startup_grace_s=6.0`，interval 约束在 2～5 秒；`RuntimePhase` 落在 domain，`WorkerHeartbeat` 留在 supervisor 且不进入 `ModelRequest`；`start()` 无法安全终止时 fail-closed 保留 slot 同时保留/补齐 heartbeat 注册；未引入 EmergencySnapshot、EmergencyEmitter、Scheduler、runtime loop 相位推进或模型上下文装配，分别留 W0-011/W0-014/W2-009/W0-016；Windows 非 venv 下 import-linter 契约测试改为解析 `Scripts/lint-imports.exe`；GitHub Actions run 在本 commit 推送后作为外部验收证据。
 
 ### W0-011 — EmergencySnapshot 检查点
 

@@ -28,6 +28,7 @@ from everweb.domain.port_contracts import (
     VisionReceipt,
     VisionRequest,
 )
+from everweb.domain.runtime_phase import RuntimePhase
 from everweb.domain.task import TaskIdentity
 from everweb.domain.terminal import InternalTerminalState
 from everweb.domain.trace import TraceEnvelope
@@ -56,6 +57,7 @@ __all__ = [
     "RecallReceipt",
     "RecallRequest",
     "Receipt",
+    "RuntimePhase",
     "RunTrace",
     "StoreReceipt",
     "Task",

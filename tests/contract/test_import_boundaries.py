@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shutil
 import subprocess
 import sys
 import tomllib
@@ -76,10 +77,20 @@ def load_import_contracts() -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
 
 
 def import_linter_command(*arguments: str) -> Sequence[str | Path]:
-    executable = Path(sys.executable).with_name(
-        "lint-imports.exe" if sys.platform == "win32" else "lint-imports"
+    script_name = "lint-imports.exe" if sys.platform == "win32" else "lint-imports"
+    candidates = [
+        Path(sys.executable).with_name(script_name),
+        Path(sys.executable).resolve().parent / "Scripts" / script_name,
+    ]
+    which = shutil.which("lint-imports")
+    if which is not None:
+        candidates.insert(0, Path(which))
+    for candidate in candidates:
+        if candidate.is_file():
+            return [candidate, "--no-cache", *arguments]
+    raise FileNotFoundError(
+        f"unable to locate {script_name} for import-linter checks"
     )
-    return [executable, "--no-cache", *arguments]
 
 
 def test_architecture_contracts_are_configured() -> None:
