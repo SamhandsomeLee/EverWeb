@@ -1,5 +1,18 @@
 """EverWeb report package boundary."""
 
+from everweb.report.evidence_writer import (
+    EvidenceConflictError,
+    EvidenceCorruptionError,
+    EvidenceError,
+    EvidenceEventTooLargeError,
+    EvidenceReadResult,
+    EvidenceRecoveryWarning,
+    EvidenceSensitiveContentError,
+    EvidenceSerializationError,
+    EvidenceWriter,
+    EvidenceWriterClosedError,
+    read_evidence,
+)
 from everweb.report.trace_writer import (
     TraceCorruptionError,
     TraceDurability,
@@ -15,6 +28,16 @@ from everweb.report.trace_writer import (
 )
 
 __all__ = [
+    "EvidenceConflictError",
+    "EvidenceCorruptionError",
+    "EvidenceError",
+    "EvidenceEventTooLargeError",
+    "EvidenceReadResult",
+    "EvidenceRecoveryWarning",
+    "EvidenceSensitiveContentError",
+    "EvidenceSerializationError",
+    "EvidenceWriter",
+    "EvidenceWriterClosedError",
     "TraceCorruptionError",
     "TraceDurability",
     "TraceError",
@@ -25,5 +48,6 @@ __all__ = [
     "TraceWriter",
     "TraceWriterClosedError",
     "compute_trace_checksum",
+    "read_evidence",
     "read_trace",
 ]

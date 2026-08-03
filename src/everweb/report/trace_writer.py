@@ -4,18 +4,22 @@ from __future__ import annotations
 
 import hashlib
 import hmac
-import json
-import math
 import os
 from dataclasses import dataclass
 from enum import StrEnum
-from pathlib import Path, PurePosixPath, PureWindowsPath
+from pathlib import Path
 from typing import Any, BinaryIO, Literal
 
 from pydantic import ValidationError
 
 from everweb.domain import TraceEnvelope
 from everweb.ports import ClockPort
+from everweb.report._persistence import (
+    CanonicalJsonError,
+    canonical_json_bytes,
+    normalize_json_value,
+    validate_single_path_segment,
+)
 
 
 class TraceError(Exception):
@@ -65,60 +69,16 @@ class TraceReadResult:
 
 def _canonical_json_bytes(value: Any) -> bytes:
     try:
-        return json.dumps(
-            value,
-            allow_nan=False,
-            ensure_ascii=False,
-            separators=(",", ":"),
-            sort_keys=True,
-        ).encode("utf-8")
-    except (TypeError, ValueError) as exc:
+        return canonical_json_bytes(value)
+    except CanonicalJsonError as exc:
         raise TraceSerializationError("trace event is not canonical JSON") from exc
 
 
-def _normalize_json_value(
-    value: Any,
-    *,
-    seen: set[int] | None = None,
-) -> Any:
-    if value is None or isinstance(value, (bool, int, str)):
-        return value
-    if isinstance(value, float):
-        if not math.isfinite(value):
-            raise TraceSerializationError("trace JSON numbers must be finite")
-        return value
-
-    active = set() if seen is None else seen
-    if isinstance(value, list):
-        identity = id(value)
-        if identity in active:
-            raise TraceSerializationError("trace JSON must not contain cycles")
-        active.add(identity)
-        try:
-            return [_normalize_json_value(item, seen=active) for item in value]
-        finally:
-            active.remove(identity)
-
-    if isinstance(value, dict):
-        identity = id(value)
-        if identity in active:
-            raise TraceSerializationError("trace JSON must not contain cycles")
-        active.add(identity)
-        try:
-            normalized: dict[str, Any] = {}
-            for key, item in value.items():
-                if not isinstance(key, str):
-                    raise TraceSerializationError(
-                        "trace JSON object keys must be strings"
-                    )
-                normalized[key] = _normalize_json_value(item, seen=active)
-            return normalized
-        finally:
-            active.remove(identity)
-
-    raise TraceSerializationError(
-        f"trace JSON value has unsupported type {type(value).__name__}"
-    )
+def _normalize_json_value(value: Any) -> Any:
+    try:
+        return normalize_json_value(value)
+    except CanonicalJsonError as exc:
+        raise TraceSerializationError("trace payload is not strict JSON") from exc
 
 
 def _envelope_value(
@@ -227,28 +187,7 @@ class TraceWriter:
         max_event_bytes: int,
         clock: ClockPort,
     ) -> None:
-        posix_id = PurePosixPath(execution_id)
-        windows_id = PureWindowsPath(execution_id)
-        has_windows_invalid_character = any(
-            character in '<>:"/\\|?*' or ord(character) < 32
-            for character in execution_id
-        )
-        invalid_path = (
-            not execution_id
-            or "\x00" in execution_id
-            or has_windows_invalid_character
-            or execution_id.endswith((".", " "))
-            or posix_id.is_absolute()
-            or windows_id.is_absolute()
-            or bool(windows_id.drive)
-            or len(posix_id.parts) != 1
-            or len(windows_id.parts) != 1
-            or windows_id.is_reserved()
-        )
-        if invalid_path:
-            raise ValueError("execution_id must be one non-empty path segment")
-        if execution_id in {".", ".."}:
-            raise ValueError("execution_id must not be a relative path marker")
+        validate_single_path_segment(execution_id, field_name="execution_id")
         if not schema_version:
             raise ValueError("schema_version must be non-empty")
         if max_event_bytes <= 0:

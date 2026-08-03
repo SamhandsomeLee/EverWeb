@@ -279,7 +279,7 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-007 — Evidence Writer 与 ArtifactRef
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(report): implement evidence writer and artifact refs`
 - 目标：实现 `evidence.jsonl`、`ArtifactRef` 和原子 Artifact 写入。
 - 对齐：§19.1、§19.2、§23.4。
@@ -287,6 +287,8 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 前置：W0-006。
 - 验收：digest/size/path 一致；敏感字段不写入共享 Artifact。
 - 测试：`U/F`。
+- 验证结果：Evidence/Artifact/Trace 定向与回归测试通过；Ruff 全绿；mypy strict 检查 56 个源文件无问题；import-linter 分析 57 个包文件与 93 条依赖，10 个契约全部保持；全量 164 个测试通过，4 个依赖平台符号链接权限的安全测试跳过；`git diff --check` 通过。
+- 偏差/未验证项：canonical 未定义 `ArtifactWrite` 字段和 `evidence.jsonl` envelope，经确认采用 `artifact_id/kind/relative_path/content/mime_type` 与每行直接一个 `EvidenceAtom`；Reader 只忽略无 LF 尾部片段，完整坏行、重复 ID、execution 不一致和敏感内容均 fail-closed；Artifact 仅允许五类共享目录，内容与可共享元数据落盘前执行 secret/reasoning reject，并通过同文件系统 hard-link 原子发布、读回校验和 pending/committed 身份记录恢复来禁止覆盖及跨 Store ID 复用；POSIX 执行父目录 fsync，Windows stdlib 无等价目录 fsync 时明确降级，单测不声明可证明断电后的物理持久性；`computed`/ConflictSet/Candidate 活跃性留待 W1-010 及后续步骤；GitHub Actions run 在本 commit 推送后作为外部验收证据。
 
 ### W0-008 — Budget 与 StepMeter 骨架
 

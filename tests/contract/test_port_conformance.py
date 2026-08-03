@@ -53,6 +53,23 @@ EXPECTED_BROWSER_CAPABILITY_FIELDS = {
     "can_clear_permissions",
     "supports_service_worker_cleanup",
 }
+EXPECTED_ARTIFACT_WRITE_FIELDS = {
+    "artifact_id",
+    "kind",
+    "relative_path",
+    "content",
+    "mime_type",
+}
+EXPECTED_ARTIFACT_REF_FIELDS = {
+    "artifact_id",
+    "kind",
+    "relative_path",
+    "sha256",
+    "byte_size",
+    "mime_type",
+    "created_at",
+    "redacted",
+}
 
 PLACEHOLDER_TYPES: tuple[type[BaseModel], ...] = (
     Task,
@@ -74,8 +91,6 @@ PLACEHOLDER_TYPES: tuple[type[BaseModel], ...] = (
     RunTrace,
     StoreReceipt,
     MemoryHealth,
-    ArtifactWrite,
-    ArtifactRef,
 )
 
 
@@ -90,6 +105,19 @@ def browser_capabilities() -> BrowserCapabilities:
         can_set_storage_state=True,
         can_clear_permissions=True,
         supports_service_worker_cleanup=True,
+    )
+
+
+def artifact_ref() -> ArtifactRef:
+    return ArtifactRef(
+        artifact_id="artifact-001",
+        kind="document",
+        relative_path="documents/artifact-001.json",
+        sha256="0" * 64,
+        byte_size=2,
+        mime_type="application/json",
+        created_at=datetime(2026, 8, 3, tzinfo=UTC),
+        redacted=False,
     )
 
 
@@ -142,10 +170,10 @@ class MemoryStub:
 
 class ArtifactStub:
     def put_bytes(self, req: ArtifactWrite) -> ArtifactRef:
-        return ArtifactRef()
+        return artifact_ref()
 
     def put_json(self, req: ArtifactWrite) -> ArtifactRef:
-        return ArtifactRef()
+        return artifact_ref()
 
     def read(self, ref: ArtifactRef) -> bytes:
         return b""
@@ -232,6 +260,52 @@ def test_browser_capabilities_are_strict_frozen_and_round_trip() -> None:
     values["browser_name"] = "chromium"
     with pytest.raises(ValidationError):
         BrowserCapabilities.model_validate(values)
+
+
+def test_artifact_contracts_are_strict_frozen_and_round_trip() -> None:
+    write = ArtifactWrite(
+        artifact_id="artifact-001",
+        kind="document",
+        relative_path="documents/artifact-001.json",
+        content={"value": 1},
+        mime_type="application/json",
+    )
+    reference = artifact_ref()
+    binary_write = ArtifactWrite(
+        artifact_id="artifact-002",
+        kind="screenshot",
+        relative_path="screenshots/artifact-002.png",
+        content=b"\x89PNG\xff",
+        mime_type="image/png",
+    )
+
+    assert set(ArtifactWrite.model_fields) == EXPECTED_ARTIFACT_WRITE_FIELDS
+    assert set(ArtifactRef.model_fields) == EXPECTED_ARTIFACT_REF_FIELDS
+    assert ArtifactWrite.model_validate_json(write.model_dump_json()) == write
+    assert (
+        ArtifactWrite.model_validate_json(binary_write.model_dump_json())
+        == binary_write
+    )
+    assert ArtifactRef.model_validate_json(reference.model_dump_json()) == reference
+
+    with pytest.raises(ValidationError):
+        setattr(reference, "byte_size", 3)
+
+    with pytest.raises(ValidationError):
+        ArtifactWrite.model_validate(
+            {
+                **write.model_dump(),
+                "relative_path": 1,
+            }
+        )
+
+    with pytest.raises(ValidationError):
+        ArtifactRef.model_validate(
+            {
+                **reference.model_dump(),
+                "provider_id": "sdk-leak",
+            }
+        )
 
 
 def test_pending_port_types_have_no_guessed_fields() -> None:

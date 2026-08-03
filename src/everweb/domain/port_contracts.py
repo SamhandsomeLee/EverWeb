@@ -1,6 +1,8 @@
 """Infrastructure-neutral value types used by core port contracts."""
 
-from pydantic import BaseModel, ConfigDict
+from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict, JsonValue
 
 from everweb.domain.contract import Receipt
 
@@ -100,8 +102,31 @@ class MemoryHealth(_PortValue):
 
 
 class ArtifactWrite(_PortValue):
-    """Pending artifact write request schema."""
+    """Content and metadata requested for one immutable artifact."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        strict=True,
+        ser_json_bytes="base64",
+        val_json_bytes="base64",
+    )
+
+    artifact_id: str
+    kind: str
+    relative_path: str
+    content: bytes | JsonValue
+    mime_type: str | None
 
 
 class ArtifactRef(_PortValue):
-    """Pending artifact reference schema."""
+    """Verified reference to one immutable artifact."""
+
+    artifact_id: str
+    kind: str
+    relative_path: str
+    sha256: str
+    byte_size: int
+    mime_type: str | None
+    created_at: datetime
+    redacted: bool
