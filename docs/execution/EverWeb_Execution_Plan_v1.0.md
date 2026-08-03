@@ -305,7 +305,7 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-009 — Spawn Worker 骨架
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(supervisor): add spawn-based worker process skeleton`
 - 目标：实现 spawn 上下文、一 Worker 一题、一 CDP 一活跃 Worker。
 - 对齐：§7.2、§7.3。
@@ -313,6 +313,8 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 前置：W0-005。
 - 验收：Playwright 初始化后无 fork；进程可启动并回收。
 - 测试：`C`。
+- 验证结果：18 个 Spawn Worker 定向 Contract 测试通过，1 个 POSIX SIGTERM escalation 测试因本机 Windows 跳过；Ruff 全绿；mypy strict 检查 62 个源文件无问题；import-linter 分析 61 个包文件与 114 条依赖，10 个契约全部保持；全量 222 个测试通过，5 个平台相关测试跳过；`git diff --check` 通过。
+- 偏差/未验证项：canonical 未定义 Worker Process API、Assignment/Handle/WorkerExitReceipt schema，经确认采用最小冻结契约与 Parent 生成的 `execution_id/task_id/pid/exit_code` Receipt；Pool 始终使用显式 spawn context，Parent 在进程启动前独占 execution/task/CDP 租约，确认 join/reap 后才释放，启动失败回滚租约；shutdown 使用有界 terminate/join 并在 POSIX 语义下升级 kill，无法停止时保留租约并 fail-closed；默认 Worker 为可替换的顶层 no-op 入口；未引入 Playwright、Heartbeat/IPC、EmergencySnapshot、EmergencyEmitter、Scheduler 或 runtime loop，分别留 W0-010/W0-011/W0-014/W2-009/W0-016；GitHub Actions run 在本 commit 推送后作为 POSIX 与外部验收证据。
 
 ### W0-010 — WorkerHeartbeat
 
