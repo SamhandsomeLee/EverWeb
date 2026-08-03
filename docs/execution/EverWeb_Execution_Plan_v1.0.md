@@ -265,7 +265,7 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-006 — Append-only Trace Writer
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(report): implement append-only trace jsonl writer`
 - 目标：实现单 Writer、checksum、关键阶段 flush/fsync 和 schema version。
 - 对齐：§19.3。
@@ -273,6 +273,9 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 前置：W0-004。
 - 验收：按 seq 追加；尾部半行读取时忽略并产生 recovery warning。
 - 测试：`U/F` 写入读回与 half-line。
+- 验证命令：`.venv\Scripts\python.exe -m pytest tests/unit/report/test_trace_writer.py tests/fault/test_trace_jsonl_recovery.py -q`；`.venv\Scripts\python.exe -m ruff check .`；`.venv\Scripts\python.exe -m mypy src tests`；`.venv\Scripts\lint-imports.exe --no-cache`；`.venv\Scripts\python.exe -m pytest -q`；`git diff --check`。
+- 验证结果：20 个定向 Trace Writer/Reader 与 fault 测试通过；Ruff 全绿；mypy strict 检查 48 个源文件无问题；import-linter 分析 46 个包文件与 59 条依赖，10 个契约全部保持；全量 108 个测试通过。
+- 偏差/未验证项：canonical 未定义 checksum、seq 起点、事件大小数值与 Writer API，经确认采用 seq 从 1 自动连续分配、排除 checksum 字段的规范 JSON SHA-256、调用方显式提供 schema version/max event bytes、buffered/flush/fsync 三级 durability；Reader 使用同一显式上限并只忽略无 LF 尾部片段，完整坏行、乱序、非规范 JSON 或 checksum 篡改均 fail-closed；未增加 TracePort 或接入 core，运行时注入留 W0-016；未声明单测可证明操作系统断电后的物理持久性；GitHub Actions run 在本 commit 推送后作为外部验收证据。
 
 ### W0-007 — Evidence Writer 与 ArtifactRef
 
