@@ -223,7 +223,7 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-003 — CompetitionCapabilities 占位契约
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(competition): add capabilities with pending placeholders`
 - 目标：实现能力结构，未知正式字段保持 `None/PendingTemplate`。
 - 对齐：§2.2、§6.1。
@@ -231,6 +231,9 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 前置：W0-002。
 - 验收：P1～P5 无猜测默认值；已公开并发、步骤、模型超时和搜索限制可表达。
 - 测试：`U`。
+- 验证命令：`.venv\Scripts\python.exe -m pytest tests/unit/competition/test_capabilities.py -q`；`.venv\Scripts\python.exe -m ruff check .`；`.venv\Scripts\python.exe -m mypy src tests`；`.venv\Scripts\lint-imports.exe --no-cache`；`.venv\Scripts\python.exe -m pytest -q`；`git diff --check`。
+- 验证结果：22 个定向 capabilities 测试通过；Ruff 全绿；mypy strict 检查 31 个源文件无问题；import-linter 分析 26 个包文件与 13 条依赖，10 个契约全部保持；全量 58 个测试通过。
+- 偏差/未验证项：`task_wall_clock_s`、`official_status_values`、`official_output_schema`、`official_step_semantics`、`downloads_parseable` 默认均为 `None`；未实现正式 status 映射、OutputMapper、competition digest 或模板覆盖层；GitHub Actions run 在本 commit 推送后作为外部验收证据。
 
 ### W0-004 — Action、Evidence 与 Trace 基础类型
 
