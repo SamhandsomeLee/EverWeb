@@ -209,7 +209,7 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-002 — 内部终态枚举
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(domain): add internal terminal state enum`
 - 目标：实现 `InternalTerminalState`。
 - 对齐：§6.2。
@@ -217,6 +217,9 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 前置：W0-001。
 - 验收：core/domain 不出现正式 `SUCCESS/FAIL` 语义映射。
 - 测试：`U` enum + architecture assertion。
+- 验证命令：`.venv\Scripts\python.exe -m pytest tests/unit/domain/test_terminal.py -q`；`.venv\Scripts\python.exe -m ruff check .`；`.venv\Scripts\python.exe -m mypy src tests`；`.venv\Scripts\lint-imports.exe --no-cache`；`.venv\Scripts\python.exe -m pytest -q`；`git diff --check`。
+- 验证结果：4 个定向 enum/architecture 测试通过（含正式 status mapping 负向 canary）；Ruff 全绿；mypy strict 检查 29 个源文件无问题；import-linter 分析 25 个包文件与 10 条依赖，10 个契约全部保持；全量 36 个测试通过。
+- 偏差/未验证项：仅实现 canonical 九值内部终态；`StatusMappingPolicy`、正式 status 与终止判定未实现；GitHub Actions run 在本 commit 推送后作为外部验收证据。
 
 ### W0-003 — CompetitionCapabilities 占位契约
 
