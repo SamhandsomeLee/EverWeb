@@ -237,7 +237,7 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-004 — Action、Evidence 与 Trace 基础类型
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(domain): add action evidence and trace envelope types`
 - 目标：增加 `TypedAction`、`EvidenceAtom` 骨架和 `TraceEnvelope`。
 - 对齐：§13.1、§15.1、§19.3。
@@ -245,6 +245,9 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 前置：W0-001。
 - 验收：Trace 有 seq、schema version、execution ID、event type、timestamp、checksum。
 - 测试：`U` schema。
+- 验证命令：`.venv\Scripts\python.exe -m pytest tests/unit/domain/test_action.py tests/unit/domain/test_evidence.py tests/unit/domain/test_trace.py -q`；`.venv\Scripts\python.exe -m ruff check .`；`.venv\Scripts\python.exe -m mypy src tests`；`.venv\Scripts\lint-imports.exe --no-cache`；`.venv\Scripts\python.exe -m pytest -q`；`git diff --check`。
+- 验证结果：25 个定向 schema 测试通过；Ruff 全绿；mypy strict 检查 37 个源文件无问题；import-linter 分析 30 个包文件与 24 条依赖，10 个契约全部保持；全量 83 个测试通过。
+- 偏差/未验证项：§13.1 未定义 `TypedAction` 类体，经确认仅实现 `action_id + kind` 最小骨架；checksum 算法、JSONL Writer 和序列化值门禁延后至 W0-006/W0-007；canonical `list`/`dict` 字段仅具 Pydantic 顶层冻结，深冻结在 Writer 落盘边界重新评估；GitHub Actions run 在本 commit 推送后作为外部验收证据。
 
 ### W0-005 — 定义核心 Ports
 
