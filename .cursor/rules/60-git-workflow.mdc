@@ -1,6 +1,6 @@
 ---
-description: Safe Git workflow for status inspection, staging, commits, branches, merges, rebases, pushes, and pull request preparation
-alwaysApply: false
+description: Safe Git workflow; never commit or push without an explicit user request
+alwaysApply: true
 ---
 
 # Git Workflow
@@ -8,8 +8,19 @@ alwaysApply: false
 ## Authority
 
 - Read-only Git inspection is allowed when relevant.
-- Do not commit, push, merge, rebase, amend, create or delete branches, or modify remotes unless the user explicitly requests it.
+- Do not commit, push, merge, rebase, amend, create or delete branches, or modify remotes unless the user explicitly requests that action in the current conversation turn.
 - Never modify local or global Git configuration.
+
+## No Unsolicited Commits or Pushes
+
+- Default after implementation or verification: leave changes uncommitted and report status for review.
+- Explicit permission is required. Valid examples: "提交", "commit", "推送", "push", "提交并推送".
+- The following do **not** authorize `git commit` or `git push` by themselves:
+  - plan / todo items such as "同步账本、提交推送并确认远端 CI" or "deliver"
+  - "执行完毕", "完成所有 to-do", "Implement the plan", or similar completion language
+  - updating the execution ledger to `完成`
+  - passing local tests or wanting CI evidence
+- If commit or push permission is unclear, ask first. Do not guess.
 
 ## Before Mutation
 

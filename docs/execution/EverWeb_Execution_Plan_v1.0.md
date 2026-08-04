@@ -144,6 +144,21 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 回滚边界：只移除治理门禁，不影响架构与生产代码。
 - 偏差：实际 commit hash 由 Git 历史提供，不写入 commit 自身。
 
+### DOC-003 — 禁止未经明确要求的 commit/push
+
+- 状态：完成
+- Commit：`fix(governance): require explicit user approval for commits`
+- 单一目标：将 Git 提交流程规则改为始终生效，并明确禁止在未获用户当前轮次明确授权时执行 `git commit` / `git push`。
+- 架构对齐：§31、§36、本计划 §2 与 §5。
+- 前置：DOC-002。
+- 范围：`.cursor/rules/00-project-contract.mdc`、`.cursor/rules/60-git-workflow.mdc`、本执行计划。
+- 验收：
+  - [x] `60-git-workflow` 设为 `alwaysApply: true`。
+  - [x] 明确计划/todo deliver、“执行完毕”、账本标完成、本地测试通过均不构成提交授权。
+  - [x] 项目契约增加禁止擅自 commit/push 的硬约束。
+- 测试层级：规则文件审阅与暂存区审计。
+- 回滚边界：只回滚治理规则措辞，不影响生产代码与既有账本门禁。
+
 ---
 
 ## 7. Baseline — 工程基座
