@@ -390,14 +390,22 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-013 — Output Contract Draft Mapper
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(competition): add output contract draft mapper`
 - 目标：建立本地 OutputContract draft 映射，正式 status 保持空缺。
-- 对齐：§6.4、§19.5。
+- 对齐：§6.4、§19.4/§19.5（§19.5 仅作“不猜正式 schema”约束）。
 - 不变量：`INV-2`、`INV-3`。
-- 前置：W0-012。
-- 验收：P2/P6 不猜测；所有 URL/Action/Capture 来自 Trace 投影。
-- 测试：`C`。
+- 前置：DOC-004、W0-012。
+- 范围：`domain/trace_projection.py`、`competition/output_contract.py`、`competition/adapter.py`、`competition/errors.py`、相关导出与 Contract/Unit 测试。
+- 验收：
+  - [x] `TraceProjection` 承载已投影 urls/actions/capture/screenshot（及可选 artifact_refs）。
+  - [x] `OutputContractDraftMapper.map_draft` 轨迹字段只来自 `TraceProjection`；`mapped_status` 恒为 `None`。
+  - [x] `NullCompetitionAdapter.map_status` 恒为 `None`；`map_output` 显式 PendingTemplate，不发明 OfficialOutput。
+  - [x] 不读取/填充 `official_output_schema`；不猜测正式 status 枚举（P2/P6）。
+  - [x] `output_contract.py` 不 import report/answer/adapters。
+- 测试：`C` + Unit。
+- 明确不做：TraceEnvelope event_type 投影表、StatusMappingPolicy 非空映射、正式 OutputMapper JSON/目录、EmergencyEmitter、修改 W0-012 serialize 语义。
+- 验证证据：`pytest` 定向 51 passed（含 import boundaries + output contract + adapter/projection unit）；`ruff`/`mypy` 通过；`lint-imports` 10 kept。
 
 ### W0-014 — Worker 死亡 EmergencyEmitter
 

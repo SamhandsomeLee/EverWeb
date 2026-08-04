@@ -35,6 +35,7 @@ from everweb.domain.runtime_phase import RuntimePhase
 from everweb.domain.task import TaskIdentity
 from everweb.domain.terminal import InternalTerminalState
 from everweb.domain.trace import TraceEnvelope
+from everweb.domain.trace_projection import TraceProjection
 
 __all__ = [
     "ActionReceipt",
@@ -69,6 +70,7 @@ __all__ = [
     "Task",
     "TaskIdentity",
     "TraceEnvelope",
+    "TraceProjection",
     "TypedAction",
     "VisionReceipt",
     "VisionRequest",
