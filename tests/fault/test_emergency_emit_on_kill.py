@@ -78,10 +78,11 @@ def test_parent_emergency_emit_after_forced_worker_death(tmp_path: Path) -> None
             time.sleep(0.01)
         assert ready_path.exists(), "worker did not persist checkpoint before hang"
 
-        if os.name == "nt":
+        sigkill = getattr(signal, "SIGKILL", None)
+        if sigkill is None:
             pool.shutdown()
         else:
-            os.kill(handle.pid, signal.SIGKILL)
+            os.kill(handle.pid, sigkill)
             receipt = pool.reap(value.execution_id, timeout_s=10.0)
             assert receipt is not None
             assert receipt.exit_code != 0

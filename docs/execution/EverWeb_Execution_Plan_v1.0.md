@@ -177,6 +177,21 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 偏差记录：这是对 BL-003 过窄门禁的纠正，不是放宽 answer/adapters 隔离。
 - 验证证据：`pytest tests/contract/test_import_boundaries.py` 16 passed；`lint-imports --no-cache` 10 kept。
 
+### DOC-005 — 修复 Fake adapters 相关 mypy 门禁
+
+- 状态：完成
+- Commit：`fix(harness): satisfy mypy for fake adapter contracts`
+- 单一目标：修复 W0-015 推送后 CI Type check 失败，使 `mypy src tests` 在严格模式下通过。
+- 架构对齐：§31、本计划 §2.1。
+- 前置：DOC-004、W0-015。
+- 范围：`tests/contract/test_fake_browser_model.py`、`tests/fault/test_emergency_emit_on_kill.py`、本执行计划。
+- 验收：
+  - [x] `module.__file__` 经显式非空断言后再构造 `Path`。
+  - [x] `signal.SIGKILL` 经 `getattr` 取得，避免 Windows typeshed 缺属性导致本地/交叉检查失败。
+  - [x] `python -m mypy src tests` 通过。
+- 测试层级：Type check（mypy）+ 既有 Contract/Fault 回归。
+- 回滚边界：只回滚测试侧类型收窄，不影响 Fake Port 行为。
+
 ---
 
 ## 7. Baseline — 工程基座

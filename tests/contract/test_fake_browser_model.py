@@ -172,7 +172,9 @@ def test_script_exhaustion_is_fail_closed() -> None:
 
 def test_fake_modules_forbid_provider_and_browser_imports() -> None:
     for module in (fake_browser_module, fake_model_module):
-        path = Path(module.__file__).resolve()
+        module_file = module.__file__
+        assert module_file is not None
+        path = Path(module_file).resolve()
         imported = _imported_modules(path)
         for module_name in imported:
             assert not any(
