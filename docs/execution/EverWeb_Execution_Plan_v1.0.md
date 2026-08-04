@@ -429,14 +429,22 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-015 — FakeBrowser 与 FakeModel
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(harness): add fake browser and fake model adapters`
 - 目标：为无密钥、无网站执行提供确定性 Fakes。
-- 对齐：§25、§31 Week 0。
+- 对齐：§25.1、§31 Week 0。
 - 不变量：`INV-11`、`INV-13`。
 - 前置：W0-005。
-- 验收：Fakes 实现公开 Port；响应可录制、可复现。
+- 范围：`harness/cassette.py`、`harness/fake_browser.py`、`harness/fake_model.py`、导出与 Contract 测试。
+- 验收：
+  - [x] `FakeBrowser` / `FakeModel` 实现公开 `BrowserPort` / `ModelPort`。
+  - [x] 默认空占位 Receipt 确定性可复现；不扩展 Port DTO 字段。
+  - [x] cassette dump/load/`from_cassette` 回放响应序列一致。
+  - [x] 脚本耗尽 fail-closed；Fake 不依赖 playwright/httpx/provider adapters。
 - 测试：`C`。
+- 明确不做：W0-016 运行闭环接线、W0-017 NullVision/NullMemory、§25.2 完整交互状态机、丰富 DOM/AX/Model schema。
+- 验证证据：`pytest tests/contract/test_fake_browser_model.py` 与相关 contract 通过；ruff/mypy 通过；`lint-imports` 10 kept。
+- 偏差/未验证项：按 DOC-003 未自动提交。
 
 ### W0-016 — Fake 最小运行闭环
 
