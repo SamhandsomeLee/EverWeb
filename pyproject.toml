@@ -75,7 +75,7 @@ forbidden_modules = ["everweb.adapters.playwright_browser"]
 
 [[tool.importlinter.contracts]]
 id = "competition-public-entry"
-name = "Competition uses only the supervisor public entry"
+name = "Competition maps contracts without report answer or private supervisor"
 type = "forbidden"
 source_modules = ["everweb.competition"]
 forbidden_modules = [
@@ -83,7 +83,6 @@ forbidden_modules = [
     "everweb.adapters",
     "everweb.answer",
     "everweb.core",
-    "everweb.domain",
     "everweb.harness",
     "everweb.perceive",
     "everweb.ports",
@@ -156,7 +155,7 @@ as_packages = false
 
 [[tool.importlinter.contracts]]
 id = "runtime-side-boundaries"
-name = "Runtime layers do not depend on application adapters or infrastructure"
+name = "Runtime layers do not depend on adapters answer perceive or harness"
 type = "forbidden"
 source_modules = [
     "everweb.competition",
@@ -171,7 +170,6 @@ forbidden_modules = [
     "everweb.answer",
     "everweb.harness",
     "everweb.perceive",
-    "everweb.report",
     "httpx",
     "playwright",
 ]

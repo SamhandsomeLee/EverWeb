@@ -46,6 +46,11 @@ VIOLATION_CANARIES = (
         "import everweb.supervisor.private\n",
     ),
     (
+        "competition-public-entry",
+        "competition/report_violation.py",
+        "import everweb.report\n",
+    ),
+    (
         "production-harness-isolation",
         "core/violation.py",
         "import everweb.harness\n",
@@ -128,9 +133,14 @@ def test_architecture_contracts_are_configured() -> None:
         "everweb.adapters.playwright_browser"
     ]
     assert contracts["competition-public-entry"]["allow_indirect_imports"] is True
-    assert "everweb.supervisor.*" in contracts["competition-public-entry"][
-        "forbidden_modules"
-    ]
+    competition_forbidden = set(
+        contracts["competition-public-entry"]["forbidden_modules"]
+    )
+    assert "everweb.supervisor.*" in competition_forbidden
+    assert "everweb.report" in competition_forbidden
+    assert "everweb.answer" in competition_forbidden
+    assert "everweb.adapters" in competition_forbidden
+    assert "everweb.domain" not in competition_forbidden
     assert contracts["production-harness-isolation"]["forbidden_modules"] == [
         "everweb.harness"
     ]
@@ -147,15 +157,46 @@ def test_architecture_contracts_are_configured() -> None:
         "everweb.adapters"
     }
     assert contracts["root-harness-isolation"]["as_packages"] is False
-    assert {"everweb.adapters", "httpx", "playwright"} <= set(
-        contracts["runtime-side-boundaries"]["forbidden_modules"]
-    )
+    runtime_forbidden = set(contracts["runtime-side-boundaries"]["forbidden_modules"])
+    assert {"everweb.adapters", "httpx", "playwright"} <= runtime_forbidden
+    assert "everweb.report" not in runtime_forbidden
+    assert "everweb.answer" in runtime_forbidden
+    assert "everweb.perceive" in runtime_forbidden
 
 
 def test_current_package_satisfies_import_contracts() -> None:
     result = subprocess.run(
         import_linter_command(),
         cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize(
+    ("module_path", "source"),
+    (
+        ("competition/allowed_domain.py", "import everweb.domain\n"),
+        ("supervisor/allowed_report.py", "import everweb.report\n"),
+        ("core/allowed_report.py", "import everweb.report\n"),
+    ),
+)
+def test_allowed_dependency_edges_are_not_rejected(
+    tmp_path: Path,
+    module_path: str,
+    source: str,
+) -> None:
+    package = tmp_path / "everweb"
+    copytree(ROOT / "src" / "everweb", package)
+    (tmp_path / "pyproject.toml").write_bytes(PYPROJECT.read_bytes())
+    (package / module_path).write_text(source, encoding="utf-8")
+
+    result = subprocess.run(
+        import_linter_command(),
+        cwd=tmp_path,
         capture_output=True,
         text=True,
         check=False,

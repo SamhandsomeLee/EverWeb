@@ -10,14 +10,19 @@ Use the dependency direction defined in §4.3 of the canonical design:
 
 ```text
 competition → supervisor → core → ports → domain
+competition → domain
+supervisor → report
+core → report
 adapters → ports/domain
-application services → ports/domain
+application services (perceive/act/answer/report) → ports/domain
 harness → public application/core interfaces
 ```
 
 - `domain` contains pure types, contracts, states, receipts, and errors. It must not import Playwright, provider SDKs, HTTP clients, adapters, or runtime services.
-- `core` orchestrates state, budget, policy, step accounting, and termination through ports. It must not import provider SDKs or adapter implementations.
-- `competition` maps official input, output, status, and step semantics. It must not depend on answer internals.
+- `core` orchestrates state, budget, policy, step accounting, and termination through ports. It may use `report` for Writers/Serializer, but must not import provider SDKs or adapter implementations.
+- `supervisor` owns Worker lifecycle and may use `report` for persistence and SERIALIZE. It must not import adapters or harness.
+- `competition` maps official input, output, status, and step semantics using `domain` types. It must not depend on answer internals, `report`, adapters, or supervisor private submodules.
+- `report` is an application layer for append-only facts and pure SERIALIZE to `OfficialOutputDraft`.
 - Adapters implement ports and must not access core private state or import one another.
 - Production modules must never import `everweb.harness`.
 - Do not create generic `utils.py`, service locators, or shared mutable globals to bypass layer ownership.

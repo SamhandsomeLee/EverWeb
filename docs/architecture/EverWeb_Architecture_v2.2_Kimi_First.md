@@ -283,16 +283,21 @@ competition/     正式输入输出、能力探测、status/step 映射
 supervisor/      Worker 生命周期、deadline、调度、EmergencyEmit
 core/            单任务状态机、预算、终止判定、Policy 编排
 ports/           Browser / Model / Vision / Memory / Artifact / Clock
-application/     perceive / act / answer / finalize 服务
- domain/         纯类型、状态、契约、Receipt、Error
+application/     perceive / act / answer / report（事实落盘与纯 SERIALIZE）
+domain/          纯类型、状态、契约、Receipt、Error
 adapters/        Playwright、Provider、EverOS、文件系统
 harness/         fixture、replay、eval、A/B、diagnostics
 ```
+
+`report/` 属于 application：负责 Trace/Evidence 等可审计事实落盘，以及无副作用的 `SERIALIZE`（`OfficialOutputDraft`）。正式模板 JSON/目录映射仍由 competition / OutputMapper 在模板解冻后完成。
 
 依赖方向：
 
 ```text
 competition → supervisor → core → ports → domain
+competition → domain
+supervisor → report
+core → report
 adapters → ports/domain
 application → ports/domain
 harness → public application/core interfaces
@@ -305,7 +310,11 @@ domain → Playwright/provider/httpx
 core → provider SDK
 answer → Playwright concrete type
 competition → answer internals
+competition → report
+competition → adapters
+competition → supervisor 私有子模块（仅公开 supervisor 包入口用于运行时编排）
 adapters → core private state
+runtime（competition/supervisor/core/ports/domain）→ harness
 ```
 
 ### 4.4 import-linter 门禁
@@ -316,8 +325,9 @@ adapters → core private state
 2. domain 禁止导入基础设施。
 3. adapters 互相独立。
 4. Provider adapter 禁止导入 Browser adapter。
-5. competition 只能依赖 supervisor 的公开入口。
+5. competition 通过 supervisor 公开入口进入运行时编排；可直接依赖 domain 做正式契约映射；不得依赖 report、answer、adapters 或 supervisor 私有子模块。
 6. harness 不得被生产代码导入。
+7. supervisor 与 core 可依赖 report（Writers / Serializer）；不得依赖 adapters 或 harness。
 
 ---
 

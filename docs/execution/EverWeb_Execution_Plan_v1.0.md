@@ -159,6 +159,24 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 测试层级：规则文件审阅与暂存区审计。
 - 回滚边界：只回滚治理规则措辞，不影响生产代码与既有账本门禁。
 
+### DOC-004 — 对齐 competition→domain 与 supervisor/core→report 依赖
+
+- 状态：完成
+- Commit：`fix(governance): align competition domain and report dependencies`
+- 单一目标：纠正 BL-003 过窄的 import 门禁，使正式契约映射可依赖 domain，并使运行时能诚实调用 report Writers/Serializer，同时继续隔离 answer/adapters/harness。
+- 架构对齐：§4.3、§4.4、INV-2、INV-3。
+- 前置：DOC-003、BL-003、W0-012。
+- 范围：`docs/architecture/EverWeb_Architecture_v2.2_Kimi_First.md`、`pyproject.toml`、`.cursor/rules/10-architecture-boundaries.mdc`、`tests/contract/test_import_boundaries.py`、本执行计划。
+- 验收：
+  - [x] 架构 §4.3/§4.4 明确允许 `competition → domain` 与 `supervisor/core → report`。
+  - [x] `competition-public-entry` 不再禁止 `everweb.domain`；仍禁止 report/answer/adapters/supervisor 私有子模块。
+  - [x] `runtime-side-boundaries` 不再禁止 `everweb.report`；仍禁止 adapters/answer/perceive/harness。
+  - [x] import 契约测试与 canary 覆盖允许边与违规边。
+- 测试层级：Contract（import-linter）。
+- 回滚边界：只回滚依赖门禁与文档表述，不影响业务实现。
+- 偏差记录：这是对 BL-003 过窄门禁的纠正，不是放宽 answer/adapters 隔离。
+- 验证证据：`pytest tests/contract/test_import_boundaries.py` 16 passed；`lint-imports --no-cache` 10 kept。
+
 ---
 
 ## 7. Baseline — 工程基座
