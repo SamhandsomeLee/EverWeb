@@ -13,6 +13,12 @@ from everweb.report.evidence_writer import (
     EvidenceWriterClosedError,
     read_evidence,
 )
+from everweb.report.serializer import (
+    SerializeRequest,
+    SerializerError,
+    SerializerValidationError,
+    serialize,
+)
 from everweb.report.trace_writer import (
     TraceCorruptionError,
     TraceDurability,
@@ -38,6 +44,9 @@ __all__ = [
     "EvidenceSerializationError",
     "EvidenceWriter",
     "EvidenceWriterClosedError",
+    "SerializeRequest",
+    "SerializerError",
+    "SerializerValidationError",
     "TraceCorruptionError",
     "TraceDurability",
     "TraceError",
@@ -50,4 +59,5 @@ __all__ = [
     "compute_trace_checksum",
     "read_evidence",
     "read_trace",
+    "serialize",
 ]

@@ -359,7 +359,7 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-012 — 纯 Serializer v0
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(report): add pure serializer v0 without side effects`
 - 目标：从持久化事实生成 `OfficialOutputDraft`。
 - 对齐：§6.4、§18.4。
@@ -367,6 +367,8 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 前置：W0-007。
 - 验收：运行时无法访问 Browser、Model、Vision、Memory、网络或目录发现。
 - 测试：`U/C` purity spy。
+- 验证结果：定向 OfficialOutputDraft/Serializer Unit+Contract 15 通过；Ruff 全绿；mypy strict 检查 77 个源文件无问题；import-linter 分析 70 个文件与 165 条依赖，10 个契约全部保持；全量 296 个测试通过，6 个平台相关测试跳过；`git diff --check` 通过。
+- 偏差/未验证项：经确认采用选项 A——`SerializeRequest` 注入已投影事实，本步不解析 TraceEnvelope、不发明 event_type 投影表；`mapped_status` 固定为 `None`，正式 status 映射留 W0-013/CompetitionAdapter；序列字段以 tuple 固化防事后篡改；`internal_terminal_state` 仅存在于 Request 不写入 Draft；未实现 EMIT、OutputMapper、FrozenStructuredAnswer/BestCandidate 完整类型或 runtime 接线；按 DOC-003 未自动提交，待用户明确要求后以预定义 commit 主题提交并推送。
 
 ### W0-013 — Output Contract Draft Mapper
 

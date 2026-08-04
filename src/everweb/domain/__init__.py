@@ -6,6 +6,7 @@ from everweb.domain.emergency import EmergencySnapshot
 from everweb.domain.errors import ErrorCode, FailureRecord
 from everweb.domain.evidence import EvidenceAtom
 from everweb.domain.gate import GateReceipt
+from everweb.domain.output import OfficialOutputDraft
 from everweb.domain.port_contracts import (
     ActionReceipt,
     ArtifactRef,
@@ -58,6 +59,7 @@ __all__ = [
     "ModelRequest",
     "ObservationReceipt",
     "ObservationRequest",
+    "OfficialOutputDraft",
     "RecallReceipt",
     "RecallRequest",
     "Receipt",
