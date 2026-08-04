@@ -1,5 +1,14 @@
 """EverWeb supervisor package boundary."""
 
+from everweb.supervisor.emergency_emitter import (
+    EmergencyEmitCorruptionError,
+    EmergencyEmitError,
+    EmergencyEmitReceipt,
+    EmergencyEmitter,
+    EmergencyEmitValidationError,
+    EmergencyReport,
+    StatusMapper,
+)
 from everweb.supervisor.emergency_snapshot import (
     CheckpointReason,
     EmergencySnapshotCorruptionError,
@@ -30,6 +39,13 @@ from everweb.supervisor.worker_process import (
 
 __all__ = [
     "CheckpointReason",
+    "EmergencyEmitCorruptionError",
+    "EmergencyEmitError",
+    "EmergencyEmitter",
+    "EmergencyEmitReceipt",
+    "EmergencyEmitValidationError",
+    "EmergencyReport",
+    "StatusMapper",
     "EmergencySnapshotCorruptionError",
     "EmergencySnapshotError",
     "EmergencySnapshotStore",

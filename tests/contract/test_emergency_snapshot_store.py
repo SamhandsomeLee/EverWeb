@@ -197,11 +197,9 @@ def test_store_rejects_naive_clock_datetime(tmp_path: Path) -> None:
         )
 
 
-def test_supervisor_exports_snapshot_surface_without_emitter() -> None:
+def test_supervisor_exports_snapshot_surface() -> None:
     import everweb.supervisor as supervisor
 
     assert supervisor.EmergencySnapshotStore is EmergencySnapshotStore
     assert supervisor.CheckpointReason is CheckpointReason
     assert issubclass(EmergencySnapshotCorruptionError, EmergencySnapshotError)
-    assert not hasattr(supervisor, "EmergencyEmitter")
-    assert not hasattr(supervisor, "emergency_emitter")

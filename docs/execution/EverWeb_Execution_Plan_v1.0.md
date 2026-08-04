@@ -409,14 +409,23 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-014 — Worker 死亡 EmergencyEmitter
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(supervisor): implement emergency emitter on worker death`
 - 目标：Parent 仅凭 Snapshot、Trace、Evidence 生成合法内部输出。
-- 对齐：§7.6。
+- 对齐：§7.6、§18.4/§18.5（内部 EMIT 原子写）。
 - 不变量：`INV-7`。
-- 前置：W0-011、W0-013。
-- 验收：无 Browser/Model；原子落盘；终态为 `WORKER_CRASHED`。
-- 测试：`F` SIGKILL。
+- 前置：W0-011、W0-013、DOC-004。
+- 范围：`supervisor/emergency_emitter.py`、导出、Unit/Contract/Fault 测试。
+- 验收：
+  - [x] 仅读 Snapshot/Trace/Evidence；无 Browser/Model/adapters 依赖。
+  - [x] `serialize` 强制 `WORKER_CRASHED`；`mapped_status` 恒为 `None`。
+  - [x] 经窄 `StatusMapper.map_status`（不 import competition、不调用 `map_output`）。
+  - [x] 原子写入 `emergency_emit/{draft,report,receipt}.json`。
+  - [x] Fault：Worker 强制终止后 Parent emit 成功（POSIX SIGKILL；Windows terminate/kill）。
+- 测试：`U/C/F`。
+- 明确不做：Trace event_type 投影表、正式 `official_output/` 目录映射（W4-010）、BestCandidate 完整类型。
+- 验证证据：定向 supervisor/emergency 相关 86 passed（2 skipped 平台无关）；ruff/mypy 通过；`lint-imports` 10 kept。
+- 偏差/未验证项：为遵守分层契约，supervisor 不直接依赖 competition，改注入 `StatusMapper`；轨迹 URL/Action 仅来自 Snapshot 字段（不发明 event_type 表）；按 DOC-003 未自动提交。
 
 ### W0-015 — FakeBrowser 与 FakeModel
 
