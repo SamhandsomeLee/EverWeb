@@ -557,14 +557,21 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W1-002 — Browser Capability Probe
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(perceive): add browser capability probe`
 - 目标：运行时探测 BrowserCapabilities 并显式表达降级。
 - 对齐：§9.2。
 - 不变量：`INV-1`。
 - 前置：W1-001。
-- 验收：九类能力有 Receipt；不假装缺失能力存在。
+- 范围：`domain/capability_probe.py`、`adapters/playwright_browser/capability_probe.py`、`perceive/browser_capability_probe.py`、U/C 测试。
+- 验收：
+  - [x] 建会话后 adapter try/fail 探测九项并缓存诚实 `BrowserCapabilities`。
+  - [x] `BrowserCapabilityProbe` 物化恰好九份 `CapabilityAvailabilityReceipt`；False 不抬升为 True。
+  - [x] 无会话报告全 False（显式降级）；不扩 BrowserPort。
 - 测试：`U/C`。
+- 明确不做：§9.3 ContextStrategy 降级链、§9.4 全量清理、W1-003 AX/DOM、Live CDP CI、MinimalRuntime 改接真实 Playwright。
+- 验证证据：`pytest tests/unit/perceive/test_browser_capability_probe.py tests/contract/test_capability_probe.py tests/contract/test_playwright_cdp_browser.py tests/contract/test_port_conformance.py tests/contract/test_import_boundaries.py` 通过；ruff/mypy/`lint-imports` 10 kept。
+- 偏差/未验证项：按 DOC-003 未自动提交。
 
 ### W1-003 — AX 与最小 DOM 感知
 

@@ -1,6 +1,12 @@
 """EverWeb domain package boundary."""
 
 from everweb.domain.action import ActionKind, TypedAction
+from everweb.domain.capability_probe import (
+    BROWSER_CAPABILITY_NAMES,
+    BrowserCapabilityName,
+    BrowserCapabilityProbeReport,
+    CapabilityAvailabilityReceipt,
+)
 from everweb.domain.contract import Receipt
 from everweb.domain.emergency import EmergencySnapshot
 from everweb.domain.errors import ErrorCode, FailureRecord
@@ -43,8 +49,12 @@ __all__ = [
     "ActionKind",
     "ArtifactRef",
     "ArtifactWrite",
+    "BROWSER_CAPABILITY_NAMES",
     "BrowserCapabilities",
+    "BrowserCapabilityName",
+    "BrowserCapabilityProbeReport",
     "BrowserSession",
+    "CapabilityAvailabilityReceipt",
     "CaptureReceipt",
     "CaptureRequest",
     "CloseReceipt",

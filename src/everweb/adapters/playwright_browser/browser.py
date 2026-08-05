@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from everweb.adapters.playwright_browser.capability_probe import (
+    empty_browser_capabilities,
+    probe_connected_browser,
+)
 from everweb.adapters.playwright_browser.connector import (
     CdpConnector,
     ConnectedBrowser,
@@ -28,30 +32,6 @@ from everweb.domain import (
     TypedAction,
 )
 
-_SESSION_CAPABILITIES = BrowserCapabilities(
-    can_create_context=True,
-    can_close_created_context=True,
-    can_create_cdp_session=True,
-    can_capture_ax_tree=False,
-    can_download=False,
-    can_open_popup=False,
-    can_set_storage_state=False,
-    can_clear_permissions=False,
-    supports_service_worker_cleanup=False,
-)
-
-_NO_SESSION_CAPABILITIES = BrowserCapabilities(
-    can_create_context=False,
-    can_close_created_context=False,
-    can_create_cdp_session=False,
-    can_capture_ax_tree=False,
-    can_download=False,
-    can_open_popup=False,
-    can_set_storage_state=False,
-    can_clear_permissions=False,
-    supports_service_worker_cleanup=False,
-)
-
 
 class PlaywrightCdpBrowser:
     """BrowserPort backed by Playwright `connect_over_cdp` plus controlled goto."""
@@ -69,6 +49,7 @@ class PlaywrightCdpBrowser:
             connector if connector is not None else default_playwright_connector()
         )
         self._connected: ConnectedBrowser | None = None
+        self._probed_capabilities: BrowserCapabilities = empty_browser_capabilities()
 
     @property
     def cdp_url(self) -> str:
@@ -76,15 +57,17 @@ class PlaywrightCdpBrowser:
 
     def capabilities(self) -> BrowserCapabilities:
         if self._connected is None:
-            return _NO_SESSION_CAPABILITIES
-        return _SESSION_CAPABILITIES
+            return empty_browser_capabilities()
+        return self._probed_capabilities
 
     def create_task_session(self, task: Task) -> BrowserSession:
         if not isinstance(task, Task):
             raise TypeError("task must be a Task")
         if self._connected is not None:
             raise BrowserSessionError("task session already active")
-        self._connected = self._connector.connect(self._cdp_url)
+        connected = self._connector.connect(self._cdp_url)
+        self._connected = connected
+        self._probed_capabilities = probe_connected_browser(connected)
         return BrowserSession()
 
     def observe(self, req: ObservationRequest) -> ObservationReceipt:
@@ -121,6 +104,7 @@ class PlaywrightCdpBrowser:
         if connected is None:
             return CloseReceipt()
         self._connected = None
+        self._probed_capabilities = empty_browser_capabilities()
         errors: list[str] = []
         for closer in (
             connected.context.close,

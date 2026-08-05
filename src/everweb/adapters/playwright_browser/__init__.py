@@ -1,6 +1,10 @@
 """EverWeb playwright browser package boundary."""
 
 from everweb.adapters.playwright_browser.browser import PlaywrightCdpBrowser
+from everweb.adapters.playwright_browser.capability_probe import (
+    empty_browser_capabilities,
+    probe_connected_browser,
+)
 from everweb.adapters.playwright_browser.connector import (
     CdpConnector,
     ConnectedBrowser,
@@ -31,5 +35,7 @@ __all__ = [
     "UnsupportedNavigationError",
     "assert_navigation_allowed",
     "default_playwright_connector",
+    "empty_browser_capabilities",
     "is_search_engine_host",
+    "probe_connected_browser",
 ]

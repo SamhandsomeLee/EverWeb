@@ -132,10 +132,11 @@ def test_recorded_cdp_session_lifecycle() -> None:
     session = browser.create_task_session(Task())
     assert isinstance(session, BrowserSession)
     assert connector.connected_urls == [CDP_URL]
+    # Minimal recorded stubs lack CDP/AX/storage APIs → honest False after probe.
     assert browser.capabilities().model_dump(mode="json") == {
         "can_create_context": True,
         "can_close_created_context": True,
-        "can_create_cdp_session": True,
+        "can_create_cdp_session": False,
         "can_capture_ax_tree": False,
         "can_download": False,
         "can_open_popup": False,
