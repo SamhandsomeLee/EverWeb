@@ -463,14 +463,22 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-016 — Fake 最小运行闭环
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(core): wire minimal runtime loop with fakes`
 - 目标：贯通 Task → Runtime → Trace → Serializer → 内部运行目录。
-- 对齐：§10、§19.1、§31 Week 0。
+- 对齐：§10、§19.1、§18.4、§31 Week 0。
 - 不变量：`INV-3`、`INV-6`、`INV-7`。
 - 前置：W0-014、W0-015。
-- 验收：无 API key 和真实网站可完成 run。
+- 范围：`domain/run_manifest.py`、`core/runtime.py`、导出与 Scenario 测试。
+- 验收：
+  - [x] 进程内短相位路径 `ANALYZE→…→EMIT`；Scenario 注入 FakeBrowser/FakeModel。
+  - [x] Trace 相位事件 + 最小 `run_manifest.json` / `run.json` + `emit/` 草稿原子落盘。
+  - [x] SERIALIZE 无 Browser/Model 副作用；`mapped_status is None`；轨迹 urls/actions 为空。
+  - [x] core 不 import harness；无 API key / 真实网站即可完成 run。
 - 测试：`S`。
+- 明确不做：SpawnWorker 接线、完整 §10.3 agent 循环、正式 §27.1 RunManifest digests、Vision/Memory、SIGKILL 复测。
+- 验证证据：`pytest tests/scenario/test_minimal_fake_run.py` 2 passed；ruff/mypy 通过；`lint-imports` 10 kept。
+- 偏差/未验证项：`InternalRunManifest` 为内部最小清单，非正式 competition RunManifest；按 DOC-003 未自动提交。
 
 ### W0-017 — Output 与 Null Adapter Contract Suite
 

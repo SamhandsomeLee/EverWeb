@@ -31,6 +31,7 @@ from everweb.domain.port_contracts import (
     VisionReceipt,
     VisionRequest,
 )
+from everweb.domain.run_manifest import InternalRunManifest
 from everweb.domain.runtime_phase import RuntimePhase
 from everweb.domain.task import TaskIdentity
 from everweb.domain.terminal import InternalTerminalState
@@ -53,6 +54,7 @@ __all__ = [
     "EvidenceAtom",
     "FailureRecord",
     "GateReceipt",
+    "InternalRunManifest",
     "InternalTerminalState",
     "MemoryHealth",
     "ModelCapabilities",
