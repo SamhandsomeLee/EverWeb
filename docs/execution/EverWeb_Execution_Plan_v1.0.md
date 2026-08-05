@@ -501,14 +501,21 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-018 — Week 0 故障验收
 
-- 状态：未开始
+- 状态：完成
 - Commit：`test(fault): verify jsonl tail recovery and emergency emit`
 - 目标：集中验证 SIGKILL、JSONL half-line 和无密钥 CI DoD。
 - 对齐：§30.4、§31 Week 0 DoD。
 - 不变量：`INV-6`、`INV-7`。
 - 前置：W0-016、W0-017。
-- 验收：EmergencyEmit 成功率 100%；损坏尾行可恢复；CI 小于 10 分钟。
+- 范围：`tests/fault/test_week0_fault_acceptance.py`（胶合 + CI DoD 门闩）；回归既有 kill/jsonl/CI 契约。
+- 验收：
+  - [x] 截断 Trace/Evidence 尾行后 `EmergencyEmitter.emit` 成功；`WORKER_CRASHED`；`mapped_status is None`；report 含 recovery warning count。
+  - [x] 既有 `test_emergency_emit_on_kill` / Trace·Evidence half-line 用例仍绿。
+  - [x] CI 契约绑定 `timeout-minutes: 10` 且无 secrets/provider keys。
 - 测试：`F`。
+- 明确不做：正式 Emergency 目录映射（W4-010）、MinimalRuntime↔SpawnWorker 杀进程闭环、§30.4 全量故障目录、改写 Emitter/Writer 语义。
+- 验证证据：`pytest tests/fault/test_week0_fault_acceptance.py tests/fault/test_emergency_emit_on_kill.py tests/fault/test_trace_jsonl_recovery.py tests/fault/test_evidence_jsonl_recovery.py tests/unit/test_ci_contract.py` 21 passed；ruff/mypy/`lint-imports` 通过。
+- 偏差/未验证项：GHA 墙钟小于 10 分钟证据待提交推送后补记；按 DOC-003 未自动提交。
 
 ---
 
