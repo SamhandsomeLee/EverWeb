@@ -482,14 +482,22 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W0-017 — Output 与 Null Adapter Contract Suite
 
-- 状态：未开始
+- 状态：完成
 - Commit：`test(contract): add output contract and null adapter suite`
 - 目标：覆盖 OutputContract、NullVision、NullMemory 与关闭可选能力。
 - 对齐：§30.2。
 - 不变量：`INV-11`。
-- 前置：W0-013、W0-015。
-- 验收：关闭 Memory/Vision 后仍能生成内部输出。
+- 前置：W0-013、W0-015、W0-016。
+- 范围：`adapters/null_vision`、`adapters/null_memory`、import-linter、Contract 套件。
+- 验收：
+  - [x] `NullVision.available() is False`；`analyze` 抛 `VisionUnavailableError`。
+  - [x] `NullMemory` recall/submit_run/health 空占位不崩溃。
+  - [x] OutputContract draft 在可选能力关闭语境下仍可生成；`mapped_status is None`。
+  - [x] MinimalRuntime + FakeBrowser/FakeModel 在 NullVision/NullMemory 关闭时仍能内部 emit。
 - 测试：`C`。
+- 明确不做：Vision/Memory 富字段、shadow/assist、将 Vision/Memory 接入 MinimalRuntime 主循环、W3-003 全量 off/shadow 等价。
+- 验证证据：`pytest tests/contract/test_null_adapters_and_output.py` 6 passed；相关 import/boundaries 通过；ruff/mypy 通过；`lint-imports` 10 kept。
+- 偏差/未验证项：按 DOC-003 未自动提交。
 
 ### W0-018 — Week 0 故障验收
 

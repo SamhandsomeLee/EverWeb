@@ -11,6 +11,7 @@ EXPECTED_PACKAGES = (
     "adapters.everos",
     "adapters.filesystem",
     "adapters.moonshot",
+    "adapters.null_memory",
     "adapters.null_vision",
     "adapters.playwright_browser",
     "answer",

@@ -59,6 +59,7 @@ modules = [
     "everweb.adapters.everos",
     "everweb.adapters.filesystem",
     "everweb.adapters.moonshot",
+    "everweb.adapters.null_memory",
     "everweb.adapters.null_vision",
     "everweb.adapters.playwright_browser",
 ]

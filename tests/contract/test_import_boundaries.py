@@ -122,6 +122,7 @@ def test_architecture_contracts_are_configured() -> None:
         "everweb.adapters.everos",
         "everweb.adapters.filesystem",
         "everweb.adapters.moonshot",
+        "everweb.adapters.null_memory",
         "everweb.adapters.null_vision",
         "everweb.adapters.playwright_browser",
     }
