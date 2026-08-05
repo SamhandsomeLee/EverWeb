@@ -192,6 +192,20 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 测试层级：Type check（mypy）+ 既有 Contract/Fault 回归。
 - 回滚边界：只回滚测试侧类型收窄，不影响 Fake Port 行为。
 
+### DOC-006 — 排除本地 verify 脚本的 ruff 范围
+
+- 状态：完成
+- Commit：`build: exclude verify scripts from ruff`
+- 单一目标：修复 W1-001 推送后 CI Lint 因本地 `verify/` CDP 探针脚本失败的问题。
+- 架构对齐：§31、BL-002（非产品路径不进入质量门禁）。
+- 前置：W1-001。
+- 范围：`pyproject.toml` ruff `exclude`、本执行计划。
+- 验收：
+  - [x] `verify/` 与 `.cursor/` 一并排除出 `ruff check .`。
+  - [x] 产品 `src/` / `tests/` lint 仍覆盖；`python -m ruff check .` 全绿。
+- 测试层级：Lint（ruff）+ 既有 CI 契约回归。
+- 回滚边界：只调整 lint 排除列表，不改 BrowserPort / adapter 行为。
+
 ---
 
 ## 7. Baseline — 工程基座
