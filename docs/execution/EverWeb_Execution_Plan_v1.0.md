@@ -525,14 +525,21 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W1-001 — Playwright CDP Browser Adapter
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(adapters): add playwright cdp browser adapter`
 - 目标：通过官方 CDP URL 建立 Playwright BrowserPort 实现。
-- 对齐：§9.1、§9.2、附录 A。
+- 对齐：§9.1、§9.2、附录 A、§23.3、§23.4。
 - 不变量：`INV-1`、`INV-9`。
 - 前置：W0-018。
-- 验收：目标站无 httpx/requests 旁路；搜索引擎 denylist 生效。
+- 范围：`adapters/playwright_browser`（connector/policy/`PlaywrightCdpBrowser`）、`optional-dependencies.browser`、CI `.[dev,browser]`、recorded CDP Contract 套件。
+- 验收：
+  - [x] `PlaywrightCdpBrowser` 实现 `BrowserPort`；默认经 `connect_over_cdp` 建隔离 context。
+  - [x] 受控 `goto(url)` 执行 scheme + 搜索引擎 denylist；`execute(NAVIGATE)` fail-closed（TypedAction 尚无 URL）。
+  - [x] adapter 包无 httpx/requests/`urllib.request` 旁路；CI 安装 playwright 包但不跑 `playwright install` / 无 secrets。
 - 测试：`C` recorded CDP。
+- 明确不做：W1-002 九项 Probe、W1-003 AX/DOM、W1-004 click/type/scroll、W1-006/W1-012 完整 Gate、§9.4 全量清理、扩 TypedAction/Task 字段、MinimalRuntime 改接真实 Playwright。
+- 验证证据：`pytest tests/contract/test_playwright_cdp_browser.py tests/contract/test_port_conformance.py tests/contract/test_import_boundaries.py tests/unit/test_ci_contract.py` 通过；全量 pytest / ruff / mypy / `lint-imports` 10 kept。
+- 偏差/未验证项：Live CDP 留后续；按 DOC-003 未自动提交。
 
 ### W1-002 — Browser Capability Probe
 

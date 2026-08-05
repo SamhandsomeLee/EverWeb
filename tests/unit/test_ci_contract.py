@@ -38,7 +38,7 @@ def test_ci_runs_required_quality_gates() -> None:
     }
     assert (
         steps["Install development dependencies"]["run"]
-        == 'python -m pip install -e ".[dev]"'
+        == 'python -m pip install -e ".[dev,browser]"'
     )
     assert steps["Lint"]["run"] == "python -m ruff check ."
     assert steps["Type check"]["run"] == "python -m mypy src tests"
@@ -46,22 +46,26 @@ def test_ci_runs_required_quality_gates() -> None:
     assert steps["Test"]["run"] == "python -m pytest -q"
 
 
-def test_ci_has_no_provider_browser_or_sealed_dependencies() -> None:
-    workflow = WORKFLOW.read_text(encoding="utf-8").casefold()
+def test_ci_has_no_provider_browser_binaries_or_sealed_dependencies() -> None:
+    workflow_text = WORKFLOW.read_text(encoding="utf-8")
+    workflow = workflow_text.casefold()
     project = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    optional = project["project"]["optional-dependencies"]
 
     for forbidden in (
         "secrets.",
         "moonshot_api_key",
         "deepseek_api_key",
-        "playwright",
-        "cdp",
+        "playwright install",
         "evalset/sealed",
     ):
         assert forbidden not in workflow
 
+    # Package install via browser extra is allowed; CDP endpoints/keys are not.
+    assert "cdp://" not in workflow
+    assert "9222" not in workflow_text
     assert project["project"]["dependencies"] == ["pydantic>=2,<3"]
-    assert set(project["project"]["optional-dependencies"]["dev"]) == {
+    assert set(optional["dev"]) == {
         "import-linter",
         "mypy",
         "pytest",
@@ -69,3 +73,4 @@ def test_ci_has_no_provider_browser_or_sealed_dependencies() -> None:
         "ruff",
         "types-pyyaml",
     }
+    assert any(dep.startswith("playwright") for dep in optional["browser"])
