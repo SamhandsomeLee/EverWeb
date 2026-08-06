@@ -1,8 +1,5 @@
 """Assemble W1-003 PageView from AX + minimal DOM facts."""
 
-from everweb.domain.page_view import PageIdentity
-
-
 from __future__ import annotations
 
 import hashlib

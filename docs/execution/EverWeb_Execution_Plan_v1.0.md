@@ -206,6 +206,20 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 测试层级：Lint（ruff）+ 既有 CI 契约回归。
 - 回滚边界：只调整 lint 排除列表，不改 BrowserPort / adapter 行为。
 
+### DOC-007 — 修复 PageView 模块导入顺序
+
+- 状态：完成
+- Commit：`fix(perceive): restore page_view future import order`
+- 单一目标：修复 W1-003 推送后 CI Lint/`from __future__` 语法失败。
+- 架构对齐：§31、本计划 §2.1。
+- 前置：W1-003。
+- 范围：`perceive/page_view.py`、本执行计划。
+- 验收：
+  - [x] 移除误插在文件顶部的重复 `PageIdentity` 导入。
+  - [x] `from __future__ import annotations` 位于文件合法位置；`ruff check .` 与 perceive 测试通过。
+- 测试层级：Lint（ruff）+ perceive Unit 回归。
+- 回滚边界：只修正导入顺序，不改 PageView 组装语义。
+
 ---
 
 ## 7. Baseline — 工程基座
