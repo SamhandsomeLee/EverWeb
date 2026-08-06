@@ -1,0 +1,20 @@
+[
+  {
+    "tag": "button",
+    "text": "Save",
+    "attrs": {},
+    "bbox": [1.0, 2.0, 3.0, 4.0],
+    "frame_id": "frame-main"
+  },
+  {
+    "tag": "input",
+    "text": "",
+    "attrs": {
+      "type": "text",
+      "aria-label": "Token",
+      "disabled": true
+    },
+    "bbox": [5.0, 6.0, 7.0, 8.0],
+    "frame_id": "frame-main"
+  }
+]

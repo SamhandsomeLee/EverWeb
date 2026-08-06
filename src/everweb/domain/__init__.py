@@ -13,6 +13,13 @@ from everweb.domain.errors import ErrorCode, FailureRecord
 from everweb.domain.evidence import EvidenceAtom
 from everweb.domain.gate import GateReceipt
 from everweb.domain.output import OfficialOutputDraft
+from everweb.domain.page_view import (
+    FrameIdentity,
+    InteractiveTarget,
+    PageIdentity,
+    PageView,
+    ProtectedState,
+)
 from everweb.domain.port_contracts import (
     ActionReceipt,
     ArtifactRef,
@@ -63,7 +70,9 @@ __all__ = [
     "ErrorCode",
     "EvidenceAtom",
     "FailureRecord",
+    "FrameIdentity",
     "GateReceipt",
+    "InteractiveTarget",
     "InternalRunManifest",
     "InternalTerminalState",
     "MemoryHealth",
@@ -73,6 +82,9 @@ __all__ = [
     "ObservationReceipt",
     "ObservationRequest",
     "OfficialOutputDraft",
+    "PageIdentity",
+    "PageView",
+    "ProtectedState",
     "RecallReceipt",
     "RecallRequest",
     "Receipt",

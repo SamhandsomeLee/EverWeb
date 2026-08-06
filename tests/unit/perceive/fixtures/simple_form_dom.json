@@ -1,0 +1,25 @@
+[
+  {
+    "tag": "script",
+    "text": "alert(1)",
+    "attrs": {},
+    "frame_id": "frame-main"
+  },
+  {
+    "tag": "style",
+    "text": "body{}",
+    "attrs": {},
+    "frame_id": "frame-main"
+  },
+  {
+    "tag": "input",
+    "text": "",
+    "attrs": {
+      "type": "checkbox",
+      "checked": true,
+      "aria-label": "Subscribe"
+    },
+    "bbox": [10.0, 20.0, 30.0, 40.0],
+    "frame_id": "frame-main"
+  }
+]

@@ -1,0 +1,25 @@
+{
+  "role": "RootWebArea",
+  "name": "Wrapped",
+  "children": [
+    {
+      "role": "generic",
+      "children": [
+        {
+          "role": "generic",
+          "children": [
+            {
+              "role": "button",
+              "name": "Save",
+              "backendDOMNodeId": 999
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "heading",
+      "name": "Settings"
+    }
+  ]
+}

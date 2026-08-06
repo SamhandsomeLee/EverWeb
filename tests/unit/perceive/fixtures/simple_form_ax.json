@@ -1,0 +1,36 @@
+{
+  "role": "RootWebArea",
+  "name": "Simple Form",
+  "children": [
+    {
+      "role": "heading",
+      "name": "Contact",
+      "level": 1
+    },
+    {
+      "role": "generic",
+      "name": "",
+      "children": [
+        {
+          "role": "group",
+          "children": [
+            {
+              "role": "textbox",
+              "name": "Email",
+              "disabled": false
+            },
+            {
+              "role": "button",
+              "name": "Submit"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "link",
+      "name": "Docs",
+      "url": "https://example.com/docs"
+    }
+  ]
+}

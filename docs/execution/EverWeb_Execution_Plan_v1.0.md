@@ -575,13 +575,20 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W1-003 — AX 与最小 DOM 感知
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(perceive): add ax snapshot and minimal dom extract`
 - 目标：构建 AX + 最小 DOM 的 PageView。
-- 对齐：§12.2、§12.6。
+- 对齐：§12.2、§12.6、§9.5、§12.3。
 - 前置：W1-002。
-- 验收：包含 page/frame 身份、epoch refs、targets 和 protected state。
+- 范围：`domain/page_view.py`、`perceive/ax_snapshot.py`、`perceive/dom_extract.py`、`perceive/page_view.py`、Unit fixtures。
+- 验收：
+  - [x] PageView 含 page/frame 身份、epoch refs、interactive targets、protected state。
+  - [x] AX 折叠包装节点并分配 `epoch:local_id`；DOM 补充 AX 缺口且不覆盖同名 AX target。
+  - [x] 不扩 `ObservationReceipt` / BrowserPort；fixtures 驱动 Unit 验收。
 - 测试：`U` fixtures。
+- 明确不做：observe 接线、snapshot diff、STALE_REF、click/type/scroll、完整 §12.5 未定义嵌套类型、Live CDP。
+- 验证证据：`pytest tests/unit/perceive/test_ax_snapshot.py tests/unit/perceive/test_dom_extract.py tests/unit/perceive/test_page_view.py` 及相关回归通过；ruff/mypy/`lint-imports` 10 kept。
+- 偏差/未验证项：按 DOC-003 未自动提交。
 
 ### W1-004 — Click/Type/Scroll TypedAction
 
