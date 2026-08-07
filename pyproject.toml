@@ -42,6 +42,7 @@ forbidden_modules = [
     "everweb.adapters",
     "everweb.answer",
     "everweb.competition",
+    "everweb.config",
     "everweb.core",
     "everweb.harness",
     "everweb.perceive",
@@ -103,6 +104,7 @@ source_modules = [
     "everweb.adapters",
     "everweb.answer",
     "everweb.competition",
+    "everweb.config",
     "everweb.core",
     "everweb.domain",
     "everweb.perceive",
@@ -111,6 +113,26 @@ source_modules = [
     "everweb.supervisor",
 ]
 forbidden_modules = ["everweb.harness"]
+
+[[tool.importlinter.contracts]]
+id = "config-boundaries"
+name = "Config depends only on domain"
+type = "forbidden"
+source_modules = ["everweb.config"]
+forbidden_modules = [
+    "everweb.act",
+    "everweb.adapters",
+    "everweb.answer",
+    "everweb.competition",
+    "everweb.core",
+    "everweb.harness",
+    "everweb.perceive",
+    "everweb.ports",
+    "everweb.report",
+    "everweb.supervisor",
+    "httpx",
+    "playwright",
+]
 
 [[tool.importlinter.contracts]]
 id = "application-boundaries"
@@ -141,6 +163,7 @@ forbidden_modules = [
     "everweb.act",
     "everweb.answer",
     "everweb.competition",
+    "everweb.config",
     "everweb.core",
     "everweb.harness",
     "everweb.perceive",

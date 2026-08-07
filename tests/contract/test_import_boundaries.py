@@ -20,6 +20,7 @@ CONTRACT_TYPES = {
     "adapter-runtime-boundaries": "forbidden",
     "application-boundaries": "forbidden",
     "competition-public-entry": "forbidden",
+    "config-boundaries": "forbidden",
     "domain-isolation": "forbidden",
     "layered-architecture": "layers",
     "production-harness-isolation": "forbidden",
@@ -30,6 +31,7 @@ CONTRACT_TYPES = {
 VIOLATION_CANARIES = (
     ("layered-architecture", "domain/violation.py", "import everweb.ports\n"),
     ("domain-isolation", "domain/violation.py", "import everweb.adapters\n"),
+    ("domain-isolation", "domain/config_violation.py", "import everweb.config\n"),
     (
         "adapter-independence",
         "adapters/moonshot/violation.py",
@@ -64,6 +66,16 @@ VIOLATION_CANARIES = (
         "adapter-runtime-boundaries",
         "adapters/filesystem/violation.py",
         "import everweb.core\n",
+    ),
+    (
+        "adapter-runtime-boundaries",
+        "adapters/moonshot/config_violation.py",
+        "import everweb.config\n",
+    ),
+    (
+        "config-boundaries",
+        "config/violation.py",
+        "import everweb.adapters\n",
     ),
     ("root-harness-isolation", "__init__.py", "import everweb.harness\n"),
     (
@@ -114,8 +126,18 @@ def test_architecture_contracts_are_configured() -> None:
         "everweb.domain",
     ]
     assert set(contracts["domain-isolation"]["source_modules"]) == {"everweb.domain"}
-    assert {"everweb.adapters", "httpx", "playwright"} <= set(
+    assert {"everweb.adapters", "everweb.config", "httpx", "playwright"} <= set(
         contracts["domain-isolation"]["forbidden_modules"]
+    )
+    assert set(contracts["config-boundaries"]["source_modules"]) == {"everweb.config"}
+    assert {"everweb.adapters", "everweb.core", "httpx", "playwright"} <= set(
+        contracts["config-boundaries"]["forbidden_modules"]
+    )
+    assert "everweb.config" in set(
+        contracts["adapter-runtime-boundaries"]["forbidden_modules"]
+    )
+    assert "everweb.config" in set(
+        contracts["production-harness-isolation"]["source_modules"]
     )
     assert set(contracts["adapter-independence"]["modules"]) == {
         "everweb.adapters.deepseek",

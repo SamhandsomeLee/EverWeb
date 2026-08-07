@@ -1,0 +1,12 @@
+[model]
+primary_profile = "kimi_primary"
+
+[profile.kimi_primary]
+provider_family = "moonshot"
+task_analyzer = { provider = "moonshot", model = "kimi-k2.6", mode = "thinking" }
+navigator = { provider = "moonshot", model = "kimi-k2.6", mode = "thinking" }
+navigator_fast = { provider = "moonshot", model = "kimi-k2.6", mode = "instant" }
+summarizer = { provider = "moonshot", model = "kimi-k2.6", mode = "instant" }
+extractor = { provider = "moonshot", model = "kimi-k2.6", mode = "thinking" }
+verifier = { provider = "moonshot", model = "kimi-k2.6", mode = "thinking" }
+vision = { provider = "moonshot", model = "kimi-k2.6" }

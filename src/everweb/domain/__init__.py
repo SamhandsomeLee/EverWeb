@@ -51,6 +51,12 @@ from everweb.domain.port_contracts import (
     VisionReceipt,
     VisionRequest,
 )
+from everweb.domain.provider_manifest import (
+    KIMI_PRIMARY_PROFILE,
+    KIMI_PRIMARY_ROLES,
+    ScoringPathProviderCall,
+    ScoringPathProviderManifest,
+)
 from everweb.domain.run_manifest import InternalRunManifest
 from everweb.domain.runtime_phase import RuntimePhase
 from everweb.domain.task import TaskIdentity
@@ -82,6 +88,8 @@ __all__ = [
     "InteractiveTarget",
     "InternalRunManifest",
     "InternalTerminalState",
+    "KIMI_PRIMARY_PROFILE",
+    "KIMI_PRIMARY_ROLES",
     "MemoryHealth",
     "ModelCapabilities",
     "ModelMessage",
@@ -99,6 +107,8 @@ __all__ = [
     "RoleNameLocator",
     "RuntimePhase",
     "RunTrace",
+    "ScoringPathProviderCall",
+    "ScoringPathProviderManifest",
     "ScrollMode",
     "SideEffectRisk",
     "StoreReceipt",

@@ -1,6 +1,6 @@
 # EverWeb 架构对齐执行计划 v1.0
 
-> 本文把 [`EverWeb_Architecture_v2.2_Kimi_First.md`](../architecture/EverWeb_Architecture_v2.2_Kimi_First.md) 转换为严格线性的工程执行账本。  
+> 本文把 [`EverWeb_Architecture_v2.2_Kimi_First.md`](../architecture/EverWeb_Architecture_v2.2_Kimi_First.md) 转换为严格线性的工程执行账本。
 > **一条执行步骤对应一个 Git commit；每个 commit 必须单一目标、可独立验证、可独立回滚、禁止 WIP。**
 
 ## 1. 文档元数据
@@ -692,14 +692,21 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W1-008 — Kimi Primary Profile
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(config): add kimi primary profile and provider manifest`
 - 目标：增加 `kimi_primary` 与 ScoringPathProviderManifest。
 - 对齐：§20.4、§20.6、§28。
 - 不变量：`INV-12`。
 - 前置：W1-007。
-- 验收：所有影响正式上下文的调用有 manifest 条目。
+- 范围：`config/model_routes.toml`（仅 kimi_primary）；domain `ScoringPathProvider*`；`everweb.config` 加载/digest/计划型 Manifest；Contract 完整性；import-linter config 边界。
+- 验收：
+  - [x] `kimi_primary` 七角色均为 `moonshot`/`kimi-k2.6`；拒绝 `latest`；无密钥入 TOML/Manifest。
+  - [x] 计划型 `ScoringPathProviderManifest` 每角色恰好一条；`assert_manifest_complete` 缺角色失败。
+  - [x] `config_digest` 稳定；adapters/domain 不依赖 `everweb.config` 反向污染。
 - 测试：`C` manifest completeness。
+- 明确不做：W1-009 TaskAnalyzer、W1-016 Admission、DeepSeek/mixed/`ModelRouteReceipt`、MinimalRuntime 真 Kimi、扩 `InternalRunManifest`、§27.1 全量 digests。
+- 验证证据：`pytest tests/contract/test_scoring_path_provider_manifest.py tests/contract/test_import_boundaries.py` 通过；ruff / mypy / `lint-imports` kept。
+- 偏差/未验证项：计划型条目 `returned_model=None`（真调用回填留后续）；按 DOC-003 未自动提交。
 
 ### W1-009 — Scalar/List TaskAnalyzer
 
