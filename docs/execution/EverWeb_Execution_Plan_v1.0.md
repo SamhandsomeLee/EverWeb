@@ -638,14 +638,21 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W1-005 — StepMeter 接入执行边界
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(core): integrate step meter with browser execute boundary`
 - 目标：所有 Browser execute 结果统一经过 StepMeter。
 - 对齐：§6.3、§11。
 - 不变量：`INV-8`。
 - 前置：W0-008、W1-004。
-- 验收：多处计数被架构测试拒绝；正式计步保持 Pending。
-- 测试：`U/C`。
+- 范围：`core/metered_browser.py`（BrowserPort 包装：execute→`StepMeter.record`）、Unit/Contract AST、Scenario 经 MeteredBrowser 计步。
+- 验收：
+  - [x] `MeteredBrowser` 为生产包内唯一 execute→record 耦合；`act`/`adapters` 不 import `core`。
+  - [x] 架构测试拒绝 `_recorded_total` 旁路累加、第二套 `StepMeter`、非允许模块调用 `.record(`。
+  - [x] 正式 `OFFICIAL_ADAPTER` / `CompetitionAdapter.count_step` 保持 Pending；默认 `ACTION_BASED`。
+- 测试：`U/C/S`。
+- 明确不做：W1-006 Policy、MinimalRuntime 动作环、Budget↔StepMeter 接线、Playwright/Fake 内嵌计步、正式 official 语义（W4-004）。
+- 验证证据：`pytest tests/unit/core/test_step_meter.py tests/unit/core/test_metered_browser.py tests/contract/test_step_meter_boundary.py tests/scenario/test_typed_action_click_type_scroll.py` 通过；ruff / mypy / `lint-imports` 10 kept。
+- 偏差/未验证项：直连未包装 `BrowserPort.execute` 仍可能绕过计步（由调用方选用 MeteredBrowser）；按 DOC-003 未自动提交。
 
 ### W1-006 — 模型外 Policy Gate
 

@@ -6,6 +6,7 @@ import ast
 from pathlib import Path
 
 from everweb.act import TypedActionExecutor
+from everweb.core import MeteredBrowser, StepAccountingMode, StepMeter
 from everweb.domain import (
     ActionKind,
     FrameIdentity,
@@ -78,7 +79,9 @@ def _page_view() -> PageView:
 
 
 def test_click_type_scroll_receipts_are_auditable() -> None:
-    browser = FakeBrowser()
+    inner = FakeBrowser()
+    meter = StepMeter(mode=StepAccountingMode.ACTION_BASED)
+    browser = MeteredBrowser(inner, meter)
     executor = TypedActionExecutor()
     page_view = _page_view()
 
@@ -110,7 +113,8 @@ def test_click_type_scroll_receipts_are_auditable() -> None:
     assert typed.target_ref == "2:1"
     assert clicked.locator_role == "button"
     assert scrolled.locator_role == "link"
-    assert [entry.op for entry in browser.calls if entry.op == "execute"] == [
+    assert meter.recorded_total == 3
+    assert [entry.op for entry in inner.calls if entry.op == "execute"] == [
         "execute",
         "execute",
         "execute",

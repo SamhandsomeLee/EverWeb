@@ -1,6 +1,7 @@
 """EverWeb core package boundary."""
 
 from everweb.core.budget import Budget, BudgetAssessment
+from everweb.core.metered_browser import MeteredBrowser
 from everweb.core.runtime import (
     MINIMAL_PHASES,
     MinimalEmitReceipt,
@@ -26,6 +27,7 @@ __all__ = [
     "BudgetAssessment",
     "InvalidStepDeltaError",
     "MINIMAL_PHASES",
+    "MeteredBrowser",
     "MinimalEmitReceipt",
     "MinimalRunResult",
     "MinimalRunSummary",
