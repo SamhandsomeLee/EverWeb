@@ -67,7 +67,8 @@ class FakeModel:
                     f"cassette contains unknown FakeModel op: {entry.op}"
                 )
             script.setdefault(entry.op, []).append(
-                response_type.model_validate(entry.response)
+                # Cassette JSON may store floats/bools needing non-strict coerce.
+                response_type.model_validate(entry.response, strict=False)
             )
         return cls(script=script)
 

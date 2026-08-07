@@ -94,8 +94,8 @@ def test_runtime_phase_and_heartbeat_contracts_are_exact() -> None:
 
 
 def test_heartbeat_stays_out_of_model_request_context() -> None:
-    assert ModelRequest.model_fields == {}
     assert "heartbeat" not in ModelRequest.model_fields
+    assert set(ModelRequest.model_fields) == {"messages", "response_format"}
     assert heartbeat_module.__file__ is not None
     source = Path(heartbeat_module.__file__).read_text(encoding="utf-8")
     assert "ModelRequest" not in source

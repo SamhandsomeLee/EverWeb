@@ -42,10 +42,6 @@ PLACEHOLDER_TYPES = (
     CaptureRequest,
     CaptureReceipt,
     CloseReceipt,
-    ModelCapabilities,
-    ModelRequest,
-    Deadline,
-    ModelReceipt,
 )
 
 FORBIDDEN_IMPORT_ROOTS = (
@@ -201,6 +197,10 @@ def test_scripted_browser_uses_injected_receipts() -> None:
     assert browser.capabilities() == FAKE_BROWSER_CAPABILITIES
 
 
-def test_model_capabilities_remain_empty_placeholder() -> None:
+def test_model_capabilities_default_empty_identity() -> None:
     assert FakeModel().capabilities() == ModelCapabilities()
-    assert set(ModelCapabilities.model_fields) == set()
+    assert set(ModelCapabilities.model_fields) == {
+        "provider",
+        "configured_model",
+        "supports_structured_output",
+    }

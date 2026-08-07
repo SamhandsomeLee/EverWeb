@@ -674,14 +674,21 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W1-007 — Moonshot/Kimi Adapter
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(adapters): add moonshot kimi model adapter`
 - 目标：实现 Kimi ModelPort 和结构化响应边界。
 - 对齐：§20.1、§20.6。
 - 不变量：`INV-12`、`INV-14`。
 - 前置：W0-005。
-- 验收：SDK 类型不泄漏；模型身份固定；Receipt 脱敏。
-- 测试：`C` recorded responses；Live 可选。
+- 范围：domain Model\* 最小字段；`adapters/moonshot`（可注入 transport + `MoonshotKimiModel`）；`optional-dependencies.model`；recorded Contract；Live skip。
+- 验收：
+  - [x] `MoonshotKimiModel` 实现 `ModelPort`；公开面无 openai SDK / httpx 类型泄漏；httpx 仅 transport 模块。
+  - [x] 固定 `moonshot` / `kimi-k2.6`；身份不一致 → `MODEL_IDENTITY_MISMATCH`；禁止 `latest`。
+  - [x] Receipt 脱敏（无 Authorization/reasoning）；畸形 JSON → `MALFORMED_MODEL_OUTPUT`；CI 无密钥。
+- 测试：`C` recorded responses；Live 可选（无 `MOONSHOT_API_KEY` skip）。
+- 明确不做：W1-008 Profile/Manifest、DeepSeek、Vision、路由切换、MinimalRuntime 改接真实 Kimi、tool 多轮。
+- 验证证据：`pytest tests/contract/test_moonshot_kimi_model.py tests/contract/test_fake_browser_model.py tests/contract/test_port_conformance.py tests/unit/test_ci_contract.py` 通过；ruff / mypy / `lint-imports` 10 kept。
+- 偏差/未验证项：Live smoke 仅本地有 key 时验证；按 DOC-003 未自动提交。
 
 ### W1-008 — Kimi Primary Profile
 

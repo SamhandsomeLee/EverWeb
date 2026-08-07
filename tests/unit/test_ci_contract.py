@@ -38,7 +38,7 @@ def test_ci_runs_required_quality_gates() -> None:
     }
     assert (
         steps["Install development dependencies"]["run"]
-        == 'python -m pip install -e ".[dev,browser]"'
+        == 'python -m pip install -e ".[dev,browser,model]"'
     )
     assert steps["Lint"]["run"] == "python -m ruff check ."
     assert steps["Type check"]["run"] == "python -m mypy src tests"
@@ -74,3 +74,4 @@ def test_ci_has_no_provider_browser_binaries_or_sealed_dependencies() -> None:
         "types-pyyaml",
     }
     assert any(dep.startswith("playwright") for dep in optional["browser"])
+    assert any(dep.startswith("httpx") for dep in optional["model"])

@@ -79,10 +79,6 @@ PLACEHOLDER_TYPES: tuple[type[BaseModel], ...] = (
     CaptureRequest,
     CaptureReceipt,
     CloseReceipt,
-    ModelCapabilities,
-    ModelRequest,
-    Deadline,
-    ModelReceipt,
     VisionRequest,
     VisionReceipt,
     RecallRequest,
@@ -347,3 +343,27 @@ def test_action_receipt_has_auditable_optional_fields() -> None:
     }
     assert ActionReceipt().ok is True
     assert ActionReceipt().error_code is None
+
+
+def test_model_port_dtos_have_minimal_fields_with_empty_defaults() -> None:
+    assert set(ModelCapabilities.model_fields) == {
+        "provider",
+        "configured_model",
+        "supports_structured_output",
+    }
+    assert set(ModelRequest.model_fields) == {"messages", "response_format"}
+    assert set(Deadline.model_fields) == {"timeout_s"}
+    assert set(ModelReceipt.model_fields) == {
+        "ok",
+        "provider",
+        "configured_model",
+        "returned_model",
+        "content_text",
+        "structured",
+        "error_code",
+        "input_tokens",
+        "output_tokens",
+    }
+    assert ModelRequest() == ModelRequest()
+    assert Deadline().timeout_s == 30.0
+    assert ModelReceipt().ok is True

@@ -1,8 +1,9 @@
 """Infrastructure-neutral value types used by core port contracts."""
 
 from datetime import datetime
+from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, JsonValue
+from pydantic import BaseModel, ConfigDict, Field, JsonValue
 
 from everweb.domain.action import ActionKind
 from everweb.domain.contract import Receipt
@@ -68,19 +69,45 @@ class CloseReceipt(Receipt):
 
 
 class ModelCapabilities(_PortValue):
-    """Pending model capabilities schema."""
+    """Advertised model identity and structured-output support."""
+
+    provider: str = ""
+    configured_model: str = ""
+    supports_structured_output: bool = False
+
+
+class ModelMessage(_PortValue):
+    """One provider-neutral chat message."""
+
+    role: Literal["system", "user", "assistant"]
+    content: str = Field(min_length=1)
 
 
 class ModelRequest(_PortValue):
-    """Pending model request schema."""
+    """Structured completion request with optional empty default for harness."""
+
+    messages: tuple[ModelMessage, ...] = ()
+    response_format: Literal["text", "json_object"] = "json_object"
 
 
 class Deadline(_PortValue):
-    """Pending deadline schema."""
+    """Wall-clock bound for one model call."""
+
+    timeout_s: float = Field(default=30.0, gt=0.0)
 
 
 class ModelReceipt(Receipt):
-    """Pending model receipt schema."""
+    """Redacted model outcome; never carries secrets or reasoning."""
+
+    ok: bool = True
+    provider: str | None = None
+    configured_model: str | None = None
+    returned_model: str | None = None
+    content_text: str | None = None
+    structured: dict[str, JsonValue] | None = None
+    error_code: str | None = None
+    input_tokens: int | None = None
+    output_tokens: int | None = None
 
 
 class VisionRequest(_PortValue):
