@@ -220,6 +220,20 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 测试层级：Lint（ruff）+ perceive Unit 回归。
 - 回滚边界：只修正导入顺序，不改 PageView 组装语义。
 
+### DOC-008 — 补齐 W1-004 验收清单
+
+- 状态：完成
+- Commit：`docs(plan): clarify W1-004 acceptance criteria`
+- 单一目标：将已完成的 W1-004 口号式验收补齐为可勾选范围/验收/明确不做/验证证据，对齐 W1-001～003 账本粒度。
+- 架构对齐：本计划 §2.1、W1-004。
+- 前置：W1-004。
+- 范围：仅本执行计划 W1-004 条目文案；不改产品代码。
+- 验收：
+  - [x] W1-004 含范围、可勾验收、测试层级、明确不做、验证证据。
+  - [x] 不改变 W1-004 状态（保持完成）；不夹带其它步骤状态迁移。
+- 测试层级：文档一致性（对照已落地实现与既有测试）。
+- 回滚边界：只回退账本文案，不影响 `5021cd6` 实现。
+
 ---
 
 ## 7. Baseline — 工程基座
@@ -612,8 +626,15 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 - 对齐：§13.1、§13.3。
 - 不变量：`INV-10`。
 - 前置：W1-003。
-- 验收：禁止 arbitrary JS、shell、任意 HTTP；locator 可审计。
-- 测试：`S`。
+- 范围：`domain` TypedAction/`RoleNameLocator`/`ScrollMode`/`ActionReceipt` 审计字段；`act/locator`+`TypedActionExecutor`；`playwright_browser/action_dispatch`；FakeBrowser 审计回填；U/S/C。
+- 验收：
+  - [x] click/type/scroll：PageView ref → role+name locator → `BrowserPort.execute` → 可审计 `ActionReceipt`（strategy/role/name/ref）。
+  - [x] adapter 仅 Locator API（`get_by_role` / `click` / `fill` / `scroll_into_view_if_needed`）；无 locator → `MISSING_LOCATOR`；源码无 `evaluate`；无 httpx/requests 旁路。
+  - [x] 非三件套 fail-closed；轻量 epoch `STALE_REF`；`extra="forbid"` 拒绝自由 CSS/XPath/JS 字段。
+- 测试：`U/S/C`。
+- 明确不做：W1-005 StepMeter、W1-006 Policy、完整 §12.3 STALE_REF、NAVIGATE TypedAction、Live CDP、observe 接线。
+- 验证证据：`pytest tests/unit/act tests/scenario/test_typed_action_click_type_scroll.py tests/unit/domain/test_action.py tests/contract/test_playwright_cdp_browser.py` 通过；全量 pytest / ruff / mypy / `lint-imports` 10 kept。
+- 偏差/未验证项：Live CDP 留后续；按 DOC-003 未自动提交。
 
 ### W1-005 — StepMeter 接入执行边界
 
