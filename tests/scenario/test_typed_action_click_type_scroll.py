@@ -6,7 +6,14 @@ import ast
 from pathlib import Path
 
 from everweb.act import TypedActionExecutor
-from everweb.core import MeteredBrowser, StepAccountingMode, StepMeter
+from everweb.core import (
+    POLICY_REJECTED,
+    MeteredBrowser,
+    PolicyGate,
+    PolicyGuardedBrowser,
+    StepAccountingMode,
+    StepMeter,
+)
 from everweb.domain import (
     ActionKind,
     FrameIdentity,
@@ -81,7 +88,10 @@ def _page_view() -> PageView:
 def test_click_type_scroll_receipts_are_auditable() -> None:
     inner = FakeBrowser()
     meter = StepMeter(mode=StepAccountingMode.ACTION_BASED)
-    browser = MeteredBrowser(inner, meter)
+    browser = PolicyGuardedBrowser(
+        MeteredBrowser(inner, meter),
+        PolicyGate(),
+    )
     executor = TypedActionExecutor()
     page_view = _page_view()
 
@@ -119,6 +129,25 @@ def test_click_type_scroll_receipts_are_auditable() -> None:
         "execute",
         "execute",
     ]
+
+
+def test_policy_rejects_hover_without_counting_steps() -> None:
+    """Policy runs on BrowserPort; unsupported kinds never reach MeteredBrowser."""
+
+    inner = FakeBrowser()
+    meter = StepMeter(mode=StepAccountingMode.ACTION_BASED)
+    browser = PolicyGuardedBrowser(
+        MeteredBrowser(inner, meter),
+        PolicyGate(),
+    )
+
+    receipt = browser.execute(
+        TypedAction(action_id="hover-1", kind=ActionKind.HOVER, target_ref="2:2")
+    )
+    assert receipt.ok is False
+    assert receipt.error_code == POLICY_REJECTED
+    assert meter.recorded_total == 0
+    assert [entry.op for entry in inner.calls if entry.op == "execute"] == []
 
 
 def test_act_and_adapter_forbid_evaluate_js() -> None:

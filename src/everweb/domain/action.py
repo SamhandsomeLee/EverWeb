@@ -32,6 +32,17 @@ class ScrollMode(StrEnum):
     INTO_VIEW = "into_view"
 
 
+class SideEffectRisk(StrEnum):
+    """§13.2 side-effect risk classes for Policy auditing."""
+
+    READ_ONLY = "read_only"
+    REVERSIBLE_UI = "reversible_ui"
+    NETWORK_READ = "network_read"
+    POTENTIAL_WRITE = "potential_write"
+    CONFIRMED_WRITE = "confirmed_write"
+    UNKNOWN = "unknown"
+
+
 class RoleNameLocator(BaseModel):
     """Auditable §13.3 first-tier locator: role + accessible name."""
 

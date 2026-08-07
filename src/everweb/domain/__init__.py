@@ -4,6 +4,7 @@ from everweb.domain.action import (
     ActionKind,
     RoleNameLocator,
     ScrollMode,
+    SideEffectRisk,
     TypedAction,
 )
 from everweb.domain.capability_probe import (
@@ -97,6 +98,7 @@ __all__ = [
     "RuntimePhase",
     "RunTrace",
     "ScrollMode",
+    "SideEffectRisk",
     "StoreReceipt",
     "Task",
     "TaskIdentity",

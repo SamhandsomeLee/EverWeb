@@ -656,14 +656,21 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W1-006 — 模型外 Policy Gate
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(core): add policy gate for typed actions`
 - 目标：在模型外校验 action、URL、selector 和 side-effect risk。
 - 对齐：§10.4、§13、§23。
 - 不变量：`INV-9`、`INV-10`。
 - 前置：W1-004。
-- 验收：模型不能修改 Budget、判 status、绕过 Policy 或提出自由代码。
-- 测试：`U` 越权拒绝。
+- 范围：`domain.SideEffectRisk`；`core/policy.py`（`PolicyGate`/`PolicyDecision`）；`core/policy_guarded_browser.py`；U/S；与 MeteredBrowser 外层叠用。
+- 验收：
+  - [x] `PolicyGate.evaluate` 仅放行 click/type/scroll + role_name；拒绝其余 kind / 缺参 / 非 role_name locator（`POLICY_REJECTED`）。
+  - [x] Gate API 无 Budget 参数且不判 status；`PolicyGuardedBrowser` deny 不调用 inner、不计步。
+  - [x] 生产包仅一份 `PolicyGate`；`act`/`adapters` 不 import `core`。
+- 测试：`U/S`。
+- 明确不做：W1-012 AnswerGate、完整 SideEffect 动态矩阵、adapter navigation_policy 搬迁、MinimalRuntime 动作环、`config/policy.toml`、正式 status/`POLICY_BLOCKED` 接线。
+- 验证证据：`pytest tests/unit/core/test_policy_gate.py tests/scenario/test_typed_action_click_type_scroll.py tests/unit/core/test_metered_browser.py` 通过；ruff / mypy / `lint-imports` 10 kept。
+- 偏差/未验证项：直连未包装 BrowserPort 仍可绕过 Policy（与 MeteredBrowser 同构，由调用方叠包装）；按 DOC-003 未自动提交。
 
 ### W1-007 — Moonshot/Kimi Adapter
 
