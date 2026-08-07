@@ -39,7 +39,6 @@ PLACEHOLDER_TYPES = (
     BrowserSession,
     ObservationRequest,
     ObservationReceipt,
-    ActionReceipt,
     CaptureRequest,
     CaptureReceipt,
     CloseReceipt,

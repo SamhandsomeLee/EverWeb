@@ -1,6 +1,11 @@
 """EverWeb domain package boundary."""
 
-from everweb.domain.action import ActionKind, TypedAction
+from everweb.domain.action import (
+    ActionKind,
+    RoleNameLocator,
+    ScrollMode,
+    TypedAction,
+)
 from everweb.domain.capability_probe import (
     BROWSER_CAPABILITY_NAMES,
     BrowserCapabilityName,
@@ -88,8 +93,10 @@ __all__ = [
     "RecallReceipt",
     "RecallRequest",
     "Receipt",
+    "RoleNameLocator",
     "RuntimePhase",
     "RunTrace",
+    "ScrollMode",
     "StoreReceipt",
     "Task",
     "TaskIdentity",

@@ -24,6 +24,7 @@ from everweb.domain import (
     CloseReceipt,
     ObservationReceipt,
     ObservationRequest,
+    RoleNameLocator,
     Task,
     TypedAction,
 )
@@ -42,7 +43,6 @@ PLACEHOLDER_TYPES = (
     BrowserSession,
     ObservationRequest,
     ObservationReceipt,
-    ActionReceipt,
     CaptureRequest,
     CaptureReceipt,
     CloseReceipt,
@@ -50,12 +50,38 @@ PLACEHOLDER_TYPES = (
 CDP_URL = "http://127.0.0.1:9222"
 
 
+class RecordedLocator:
+    def __init__(self, *, role: str, name: str | None) -> None:
+        self.role = role
+        self.name = name
+        self.clicks = 0
+        self.fills: list[str] = []
+        self.scrolls = 0
+
+    def click(self) -> None:
+        self.clicks += 1
+
+    def fill(self, text: str) -> None:
+        self.fills.append(text)
+
+    def scroll_into_view_if_needed(self) -> None:
+        self.scrolls += 1
+
+
 class RecordedPage:
     def __init__(self) -> None:
         self.goto_urls: list[str] = []
+        self.role_lookups: list[tuple[str, str | None]] = []
+        self.locators: list[RecordedLocator] = []
 
     def goto(self, url: str) -> None:
         self.goto_urls.append(url)
+
+    def get_by_role(self, role: str, *, name: str | None = None) -> RecordedLocator:
+        self.role_lookups.append((role, name))
+        locator = RecordedLocator(role=role, name=name)
+        self.locators.append(locator)
+        return locator
 
 
 class RecordedContext:
@@ -145,10 +171,10 @@ def test_recorded_cdp_session_lifecycle() -> None:
         "supports_service_worker_cleanup": False,
     }
     assert isinstance(browser.observe(ObservationRequest()), ObservationReceipt)
-    assert isinstance(
-        browser.execute(TypedAction(action_id="a1", kind=ActionKind.CLICK)),
-        ActionReceipt,
-    )
+    missing = browser.execute(TypedAction(action_id="a1", kind=ActionKind.CLICK))
+    assert isinstance(missing, ActionReceipt)
+    assert missing.ok is False
+    assert missing.error_code == "MISSING_LOCATOR"
     assert isinstance(browser.capture(CaptureRequest()), CaptureReceipt)
 
     receipt = browser.close_task_session()
@@ -199,6 +225,91 @@ def test_execute_navigate_is_fail_closed() -> None:
 
     with pytest.raises(UnsupportedNavigationError):
         browser.execute(TypedAction(action_id="nav-1", kind=ActionKind.NAVIGATE))
+
+
+def _role_name_action(
+    *,
+    action_id: str,
+    kind: ActionKind,
+    role: str,
+    name: str,
+    text: str | None = None,
+) -> TypedAction:
+    return TypedAction(
+        action_id=action_id,
+        kind=kind,
+        target_ref="1:1",
+        text=text,
+        locator=RoleNameLocator(
+            role=role,
+            name=name,
+            frame_id="frame-main",
+            ref="1:1",
+        ),
+    )
+
+
+def test_execute_click_type_scroll_uses_locator_api() -> None:
+    connector = RecordedCdpConnector()
+    browser = PlaywrightCdpBrowser(cdp_url=CDP_URL, connector=connector)
+    browser.create_task_session(Task())
+
+    click_receipt = browser.execute(
+        _role_name_action(
+            action_id="click-1",
+            kind=ActionKind.CLICK,
+            role="button",
+            name="Submit",
+        )
+    )
+    type_receipt = browser.execute(
+        _role_name_action(
+            action_id="type-1",
+            kind=ActionKind.TYPE,
+            role="textbox",
+            name="Email",
+            text="a@example.com",
+        )
+    )
+    scroll_receipt = browser.execute(
+        _role_name_action(
+            action_id="scroll-1",
+            kind=ActionKind.SCROLL,
+            role="link",
+            name="Docs",
+        )
+    )
+
+    assert click_receipt.ok and type_receipt.ok and scroll_receipt.ok
+    assert click_receipt.locator_strategy == "role_name"
+    assert connector.page.role_lookups == [
+        ("button", "Submit"),
+        ("textbox", "Email"),
+        ("link", "Docs"),
+    ]
+    assert len(connector.page.locators) == 3
+    assert connector.page.locators[0].clicks == 1
+    assert connector.page.locators[1].fills == ["a@example.com"]
+    assert connector.page.locators[2].scrolls == 1
+
+
+def test_execute_without_locator_returns_fail_receipt() -> None:
+    browser = PlaywrightCdpBrowser(cdp_url=CDP_URL, connector=RecordedCdpConnector())
+    browser.create_task_session(Task())
+
+    receipt = browser.execute(
+        TypedAction(action_id="click-1", kind=ActionKind.CLICK, target_ref="1:1")
+    )
+    assert receipt.ok is False
+    assert receipt.error_code == "MISSING_LOCATOR"
+
+
+def test_adapter_sources_forbid_evaluate() -> None:
+    for path in ADAPTER_ROOT.rglob("*.py"):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call):
+                assert "evaluate" not in ast.dump(node.func).lower()
 
 
 def test_adapter_package_forbids_http_client_bypass_imports() -> None:

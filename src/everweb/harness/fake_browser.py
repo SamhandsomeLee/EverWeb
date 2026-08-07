@@ -94,7 +94,8 @@ class FakeBrowser:
                     f"cassette contains unknown FakeBrowser op: {entry.op}"
                 )
             script.setdefault(entry.op, []).append(
-                response_type.model_validate(entry.response)
+                # Cassette JSON stores enum values as strings; coerce on replay.
+                response_type.model_validate(entry.response, strict=False)
             )
         return cls(script=script)
 
@@ -126,7 +127,18 @@ class FakeBrowser:
     def execute(self, action: TypedAction) -> ActionReceipt:
         if not isinstance(action, TypedAction):
             raise TypeError("action must be a TypedAction")
-        response = self._next_response("execute", ActionReceipt())
+        default = ActionReceipt(
+            action_id=action.action_id,
+            kind=action.kind,
+            ok=True,
+            target_ref=action.target_ref,
+            locator_strategy=(
+                None if action.locator is None else action.locator.strategy
+            ),
+            locator_role=None if action.locator is None else action.locator.role,
+            locator_name=None if action.locator is None else action.locator.name,
+        )
+        response = self._next_response("execute", default)
         assert isinstance(response, ActionReceipt)
         self._record("execute", model_to_json_object(action), response)
         return response

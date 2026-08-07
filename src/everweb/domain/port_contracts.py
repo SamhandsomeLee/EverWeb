@@ -4,6 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, JsonValue
 
+from everweb.domain.action import ActionKind
 from everweb.domain.contract import Receipt
 
 
@@ -42,7 +43,16 @@ class ObservationReceipt(Receipt):
 
 
 class ActionReceipt(Receipt):
-    """Pending action receipt schema."""
+    """Action outcome with optional auditable locator provenance."""
+
+    action_id: str | None = None
+    kind: ActionKind | None = None
+    ok: bool = True
+    target_ref: str | None = None
+    locator_strategy: str | None = None
+    locator_role: str | None = None
+    locator_name: str | None = None
+    error_code: str | None = None
 
 
 class CaptureRequest(_PortValue):

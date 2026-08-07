@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from everweb.adapters.playwright_browser.action_dispatch import dispatch_typed_action
 from everweb.adapters.playwright_browser.capability_probe import (
     empty_browser_capabilities,
     probe_connected_browser,
@@ -79,12 +80,20 @@ class PlaywrightCdpBrowser:
     def execute(self, action: TypedAction) -> ActionReceipt:
         if not isinstance(action, TypedAction):
             raise TypeError("action must be a TypedAction")
-        self._require_session()
+        connected = self._require_session()
         if action.kind is ActionKind.NAVIGATE:
             raise UnsupportedNavigationError(
-                "TypedAction NAVIGATE requires a URL payload; use goto(url) until W1-004"
+                "TypedAction NAVIGATE requires a URL payload; use goto(url)"
             )
-        return ActionReceipt()
+        if action.kind in {ActionKind.CLICK, ActionKind.TYPE, ActionKind.SCROLL}:
+            return dispatch_typed_action(connected.page, action)
+        return ActionReceipt(
+            action_id=action.action_id,
+            kind=action.kind,
+            ok=False,
+            target_ref=action.target_ref,
+            error_code="UNSUPPORTED_KIND",
+        )
 
     def capture(self, req: CaptureRequest) -> CaptureReceipt:
         if not isinstance(req, CaptureRequest):

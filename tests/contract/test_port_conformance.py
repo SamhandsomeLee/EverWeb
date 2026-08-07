@@ -76,7 +76,6 @@ PLACEHOLDER_TYPES: tuple[type[BaseModel], ...] = (
     BrowserSession,
     ObservationRequest,
     ObservationReceipt,
-    ActionReceipt,
     CaptureRequest,
     CaptureReceipt,
     CloseReceipt,
@@ -333,3 +332,18 @@ def test_receipt_placeholders_preserve_receipt_contract() -> None:
     )
 
     assert all(issubclass(receipt_type, Receipt) for receipt_type in receipt_types)
+
+
+def test_action_receipt_has_auditable_optional_fields() -> None:
+    assert set(ActionReceipt.model_fields) == {
+        "action_id",
+        "kind",
+        "ok",
+        "target_ref",
+        "locator_strategy",
+        "locator_role",
+        "locator_name",
+        "error_code",
+    }
+    assert ActionReceipt().ok is True
+    assert ActionReceipt().error_code is None

@@ -1,8 +1,11 @@
 """Typed action facts owned by the domain layer."""
 
-from enum import StrEnum
+from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict
+from enum import StrEnum
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ActionKind(StrEnum):
@@ -23,10 +26,32 @@ class ActionKind(StrEnum):
     TRIGGER_DOWNLOAD = "trigger_download"
 
 
+class ScrollMode(StrEnum):
+    """Minimal scroll modes for W1-004."""
+
+    INTO_VIEW = "into_view"
+
+
+class RoleNameLocator(BaseModel):
+    """Auditable §13.3 first-tier locator: role + accessible name."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+
+    strategy: Literal["role_name"] = "role_name"
+    role: str = Field(min_length=1)
+    name: str | None = None
+    frame_id: str = Field(min_length=1)
+    ref: str = Field(min_length=1)
+
+
 class TypedAction(BaseModel):
-    """Minimal typed action pending per-kind parameter contracts."""
+    """Typed action with minimal click/type/scroll parameters."""
 
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     action_id: str
     kind: ActionKind
+    target_ref: str | None = None
+    text: str | None = None
+    scroll_mode: ScrollMode | None = None
+    locator: RoleNameLocator | None = None

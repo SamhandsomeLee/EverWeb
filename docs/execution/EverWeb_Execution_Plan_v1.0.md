@@ -606,7 +606,7 @@ Week 0～3 只允许使用内部终态、`OfficialOutputDraft`、显式 `None/Pe
 
 ### W1-004 — Click/Type/Scroll TypedAction
 
-- 状态：未开始
+- 状态：完成
 - Commit：`feat(act): implement typed action executor for click type scroll`
 - 目标：执行三类最小 TypedAction 并产生 ActionReceipt。
 - 对齐：§13.1、§13.3。
